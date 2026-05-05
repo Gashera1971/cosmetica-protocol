@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v8.8</title>
+<title>Cosmetica Protocol v8.9</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -59,7 +59,7 @@ input.datum{font-size:20px;font-weight:700;font-family:Georgia,serif;width:calc(
 input.ph{font-size:20px;font-weight:700;width:65px;text-align:center;}
 input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 .notice{text-align:center;padding:10px 8px;color:#c0392b;font-size:12px;font-style:italic;font-weight:600;line-height:1.5;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2a7a4a;color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:600;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2a7a4a;color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9998;}
 .toast.show{opacity:1;}
 @media print{
   body{background:#fff;padding:0;}
@@ -106,7 +106,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   <div class="ctrl-row">
     <label>Tabel tekst</label>
     <input type="range" id="tableSize" min="10" max="20" value="17"
-      oninput="document.getElementById('tableSizeVal').textContent=this.value+'px';document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize=document.getElementById('tableSize').value+'px';});">
+      oninput="document.getElementById('tableSizeVal').textContent=this.value+'px';document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize=this.value+'px';}.bind(this));">
     <span class="val" id="tableSizeVal">17px</span>
     <label>Kop tekst</label>
     <input type="range" id="headerSize" min="9" max="20" value="16"
@@ -194,7 +194,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
       </div>
       <div style="display:flex;align-items:center;">
         <input type="text" id="tarraResult" maxlength="8"
-          style="width:130px;border:none;outline:none;background:#fff;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:5px 6px 5px 34px;color:#2a7a4a;-webkit-text-fill-color:#2a7a4a;-webkit-user-select:text;">
+          style="width:130px;border:none;outline:none;background:#fff;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:5px 6px 5px 34px;color:#2a7a4a;-webkit-text-fill-color:#2a7a4a;">
         <span style="font-size:12px;color:#2a7a4a;padding-right:5px;font-weight:700;">g</span>
       </div>
     </div>
@@ -232,7 +232,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
   <!-- PRINT FOOTER -->
   <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
-    <div style="font-size:10px;color:#555;">Cosmetica Protocol v8.8</div>
+    <div style="font-size:10px;color:#555;">Cosmetica Protocol v8.9</div>
     <div style="font-size:10px;color:#555;">© Copyright 2026 Sheila Willeboordse</div>
   </div>
 
@@ -257,16 +257,16 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 <div id="helpModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
   <div style="background:#fff;margin:20px auto;max-width:500px;border-radius:12px;padding:24px;position:relative;">
     <button onclick="document.getElementById('helpModal').style.display='none'"
-      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">&#x2715;</button>
+      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">✕</button>
     <h2 style="font-family:Impact,sans-serif;color:#c1724a;margin-bottom:16px;font-size:22px;">Handleiding</h2>
     <h3 style="color:#333;margin:12px 0 6px;">1. Protocol deels invullen</h3>
     <p style="font-size:14px;color:#444;line-height:1.6;">Vul Fase, %, Ingrediënten, Bereiding en Pr. Info in. Druk op de 💾 Opslaan button. Sla het bestandje op in Google Drive in de map <strong>"Protocollen om mee te bereiden"</strong>.</p>
 
     <h3 style="color:#333;margin:12px 0 6px;">2. In het lab — protocol bereiden</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 📂 Laden button. Kies het bestandje uit de map <strong>"Protocollen om mee te bereiden"</strong> in Google Drive. Vul Batch, V kolom, Info en Datum aan.</p>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 📂 Laden button. Kies het bestandje uit de map <strong>"Protocollen om mee te bereiden"</strong> in Google Drive. Vul Batch, Tarra, pH en Opbrengst in.</p>
 
     <h3 style="color:#333;margin:12px 0 6px;">3. Protocol volledig ingevuld</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 🖨 Afdrukken button om het protocol af te drukken. Druk daarna op de 💾 Opslaan button en sla het op in Google Drive in de map <strong>"Bereide protocollen"</strong>.</p>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 🖨 Afdrukken button om het protocol af te drukken. Druk daarna op de 💾 Opslaan button en sla het op in Google Drive in de map <strong>"Voltooide protocollen"</strong>.</p>
 
     <h3 style="color:#333;margin:12px 0 6px;">Spraakinvoer</h3>
     <p style="font-size:14px;color:#444;line-height:1.6;">Spreek je gegevens in. Druk daarna op de 🎤 Corrigeer tekst button om gesproken woorden naar cijfers te vervangen.</p>
@@ -277,13 +277,13 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v8.8</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v8.9</div>
 
 <!-- SAVE INSTRUCTIONS MODAL -->
 <div id="saveModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
   <div style="background:#fff;margin:20px auto;max-width:460px;border-radius:12px;padding:24px;position:relative;">
     <button onclick="document.getElementById('saveModal').style.display='none'"
-      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">&#x2715;</button>
+      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">✕</button>
     <h2 style="font-family:Impact,sans-serif;color:#2a7a4a;margin-bottom:16px;font-size:22px;">💾 Recept opgeslagen!</h2>
     <p style="font-size:14px;color:#444;margin-bottom:12px;line-height:1.6;">Je recept staat in je <strong>Downloads</strong> map. Sla het op in Google Drive:</p>
 
