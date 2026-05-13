@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmetica Protocol v9.5.1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
+label{font-size:11px;color:#000;text-transform:uppercase;letter-spacing:.04em;font-weight:900;}
+select,input[type=number]{font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#333;}
+select{width:110px;}input[type=number]{width:60px;}
+input[type=range]{flex:1;min-width:50px;accent-color:#c1724a;}
+.val{font-size:12px;color:#555;min-width:30px;}
+.ctrl{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid #ccc;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;}
+.ctrl-row:last-child{margin-bottom:0;}
+.btn{border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;font-weight:600;font-family:Georgia,serif;text-transform:none;display:inline-block;}
+.btn-print{background:#c1724a;color:#fff;}
+.btn-email{background:#fff;color:#333;border:1px solid #ccc;}
+.btn-fix{background:#4a7fc1;color:#fff;}
+.btn-send{background:#2a7a4a;color:#fff;font-size:12px;padding:8px 12px;}
+.btn-save{background:#7a4ac1;color:#fff;}
+.btn-load{background:#c14a7a;color:#fff;}
+.btn-clear{background:#eee;color:#666;border:1px solid #ccc;}
+.btn-help{background:#888;color:#fff;padding:8px 14px;font-size:16px;font-weight:900;}
+.btn-screenshot{background:#555;color:#fff;}
+.template{background:#fff;border:1.5px solid #333;border-radius:12px;padding:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.header-box{display:flex;border:2px solid #333;border-radius:8px;overflow:hidden;margin-bottom:14px;align-items:stretch;}
+.header-recept-wrap{display:flex;align-items:center;padding:6px 10px;background:#fff;border-right:2px solid #333;white-space:nowrap;width:110px;flex:none;}
+.header-recept-wrap input{border:none;outline:none;background:transparent;font-family:Impact,sans-serif;color:#222;width:100%;}
+.header-recept-wrap input::placeholder{color:#ccc;font-family:Impact,sans-serif;}
+.header-name-wrap{flex:1;background:#c1724a;padding:6px 12px;display:flex;align-items:center;}
+.header-name-wrap input{background:transparent;border:none;outline:none;color:#fff;width:100%;text-align:center;}
+.header-name-wrap input::placeholder{color:rgba(255,255,255,0.35);font-style:italic;}
+.section-label{font-size:13px;font-weight:700;text-decoration:underline;margin-bottom:6px;color:#222;}
+.table-wrap{overflow-x:auto;margin-bottom:6px;}
+table.ingr{border-collapse:collapse;table-layout:fixed;min-width:100%;}
+table.ingr th,table.ingr td{border:1px solid #333;padding:3px 5px;overflow:hidden;position:relative;color:#222;}
+table.ingr th{background:#f0ebe4;font-weight:600;font-size:11px;user-select:none;}
+table.ingr td input{border:none;outline:none;background:transparent;width:100%;}
+.resizer{position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;background:transparent;z-index:1;}
+.resizer:hover{background:rgba(193,114,74,0.4);}
+.row-btns{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.row-btn{font-size:12px;padding:5px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#333;cursor:pointer;}
+.del-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:12px;padding:2px;width:100%;}
+.del-btn:hover{color:#c1724a;}
+.prep-table{width:100%;border-collapse:collapse;margin-bottom:6px;}
+.prep-table td{border:1px solid #333;}
+.prep-table td input{width:100%;border:none;outline:none;background:transparent;padding:6px 8px;color:#222;font-family:Georgia,serif;}
+.bot{border:2px solid #333;border-radius:8px;overflow:hidden;margin-top:12px;}
+.bot-row{display:flex;align-items:stretch;border-bottom:1px solid #333;}
+.bot-row:last-child{border-bottom:none;}
+.bot-lbl{padding:6px 8px;background:#f0ebe4;font-size:13px;font-weight:700;white-space:nowrap;border-right:1px solid #333;display:flex;align-items:center;}
+.bot-val{display:flex;align-items:center;flex:1;}
+.bot-val input{border:none;outline:none;background:transparent;padding:6px 8px;color:#222;}
+input.datum{font-size:20px;font-weight:700;font-family:Georgia,serif;width:calc(10ch + 20px);flex:none;}
+input.ph{font-size:20px;font-weight:700;width:65px;text-align:center;}
+input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
+.notice{text-align:center;padding:10px 8px;color:#c0392b;font-size:12px;font-style:italic;font-weight:600;line-height:1.5;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2a7a4a;color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+@media print{
+  body{background:#fff;padding:0;}
+  .no-print,.ctrl,.row-btns{display:none!important;}
+  .print-footer-block{display:block!important;}
+  tr.empty-row{display:none!important;}
+  #datumBalkFixed{page-break-inside:avoid;break-inside:avoid;page-break-after:avoid;}
+  td.del-td,th.del-th{display:none!important;}
+  iframe,*[class*="tiiny"],*[id*="tiiny"],*[class*="badge"],*[class*="banner"]{display:none!important;}
+  div[style*="position:fixed"]{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="ctrl no-print">
+  <div class="ctrl-row">
+    <label>Recept L.grootte</label>
+    <input type="range" id="receptSize" min="14" max="52" value="28"
+      oninput="document.getElementById('receptSizeVal').textContent=this.value+'px';document.getElementById('receptWord').style.fontSize=this.value+'px';">
+    <span class="val" id="receptSizeVal">28px</span>
+  </div>
+  <div class="ctrl-row">
+    <label>Pr. naam L.type</label>
+    <select id="nameFontSel" onchange="applyNameStyle()">
+      <option value="Arial,sans-serif" selected>Arial</option>
+      <option value="Arial Black,sans-serif">Arial Black</option>
+      <option value="Verdana,sans-serif">Verdana</option>
+      <option value="Trebuchet MS,sans-serif">Trebuchet MS</option>
+      <option value="Georgia,serif">Georgia</option>
+      <option value="'Times New Roman',serif">Times New Roman</option>
+      <option value="Impact,sans-serif">Impact</option>
+      <option value="'Courier New',monospace">Courier New</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+      <input type="checkbox" id="nameBold" checked onchange="applyNameStyle()"
+        style="width:18px;height:18px;accent-color:#c1724a;cursor:pointer;">BOLD
+    </label>
+    <label>Pr. naam L.grootte</label>
+    <input type="range" id="nameSize" min="12" max="40" value="22"
+      oninput="document.getElementById('nameSizeVal').textContent=this.value+'px';applyNameStyle();">
+    <span class="val" id="nameSizeVal">22px</span>
+  </div>
+  <div class="ctrl-row">
+    <label>Tabel tekst</label>
+    <input type="range" id="tableSize" min="10" max="20" value="17"
+      oninput="document.getElementById('tableSizeVal').textContent=this.value+'px';document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize=this.value+'px';});">
+    <span class="val" id="tableSizeVal">17px</span>
+    <label>Kop tekst</label>
+    <input type="range" id="headerSize" min="9" max="20" value="16"
+      oninput="document.getElementById('headerSizeVal').textContent=this.value+'px';applyHeaderSize();">
+    <span class="val" id="headerSizeVal">16px</span>
+  </div>
+  <div class="ctrl-row">
+    <label>Ingr. rijen</label>
+    <input type="number" id="ingrRows" value="10" min="1" max="30"
+      onchange="ingrRowCount=parseInt(this.value)||10;buildIngrTable();">
+    <label>Bereid. rijen</label>
+    <input type="number" id="prepRows" value="8" min="1" max="20"
+      onchange="prepRowCount=parseInt(this.value)||8;buildPrepTable();">
+    <label>Opm. rijen</label>
+    <input type="number" id="notesRows" value="2" min="1" max="20"
+      onchange="notesRowCount=parseInt(this.value)||4;buildNotesTable();">
+  </div>
+  <div class="ctrl-row" style="gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-fix" onclick="fixText()">🎤 Corrigeer tekst</button>
+    <button class="btn btn-clear" onclick="clearAll()">🗑 Leegmaken</button>
+  </div>
+  <div class="ctrl-row" style="gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-print" onclick="doPrint()">🖨 Afdrukken</button>
+  </div>
+  <div class="ctrl-row" style="gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-save" onclick="saveData()">💾 Opslaan</button>
+    <label class="btn btn-load" for="loadFile" style="text-transform:none;" onclick="showToast('💡 Tip: open Google Drive app eerst!')">📂 Laden</label>
+    <input type="file" id="loadFile" accept=".json" style="display:none;" onchange="loadData(event)">
+    <button class="btn btn-help" onclick="showHelp()">?</button>
+  </div>
+
+</div>
+
+<div class="template" id="template">
+  <div class="header-box">
+    <div class="header-recept-wrap">
+      <input type="text" id="receptWord" placeholder="" style="font-size:28px;color:#222;text-align:center;">
+    </div>
+    <div class="header-name-wrap">
+      <input type="text" id="productName" placeholder="">
+    </div>
+  </div>
+
+  <div class="section-label">ingrediënten:</div>
+  <div class="table-wrap">
+    <table class="ingr" id="ingrTable">
+      <colgroup id="colgroup"></colgroup>
+      <thead id="ingrHead"></thead>
+      <tbody id="ingrBody"></tbody>
+    </table>
+  </div>
+  <div class="row-btns">
+    <button class="row-btn" onclick="addIngrRow()">+ rij</button>
+    <button class="row-btn" onclick="sortByFase()"
+      style="background:#c1724a;color:#fff;border:none;font-weight:600;">A→Z Fase</button>
+    <button class="row-btn" onclick="calcPercFromGram()"
+      style="background:#4a7fc1;color:#fff;border:none;font-weight:600;">% ← g</button>
+  </div>
+
+  <div class="section-label">bereiding:</div>
+  <table class="prep-table" id="prepTable"></table>
+  <div class="row-btns" style="margin-top:11px;">
+    <button class="row-btn" onclick="addPrepRow()">+ rij</button>
+    <button class="row-btn" onclick="removePrepRow()">− rij</button>
+  </div>
+
+  <!-- LOSSE DATUM BALK - altijd zichtbaar, bij print vast onderaan pag 1 -->
+  <div id="datumBalkFixed" style="border:1.5px solid #333;border-radius:6px;padding:4px 12px;margin-bottom:8px;display:flex;align-items:center;background:#f0ebe4;">
+    <span style="font-size:13px;font-weight:700;color:#555;margin-right:10px;white-space:nowrap;">datum:</span>
+    <input type="text" id="datum" maxlength="14"
+      style="flex:1;border:none;outline:none;background:transparent;font-size:24px;font-weight:700;font-family:Georgia,serif;color:#222;padding:4px 0;-webkit-user-select:text;user-select:text;">
+  </div>
+
+  <div style="page-break-inside:avoid;break-inside:avoid;">
+    <!-- T= groep links compact -->
+    <div style="display:inline-flex;flex-direction:column;border:1.5px solid #333;border-radius:6px;overflow:hidden;margin-bottom:6px;vertical-align:top;">
+      <div style="display:flex;align-items:center;border-bottom:1px solid #333;">
+        <div class="bot-lbl" style="font-size:11px;padding:5px 6px;border-right:1px solid #333;">T=</div>
+        <input type="text" id="tarra" maxlength="8" oninput="calcTarra()"
+          style="width:110px;border:none;outline:none;background:transparent;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:5px 6px;-webkit-user-select:text;">
+        <span style="font-size:12px;color:#888;padding-right:5px;">g</span>
+      </div>
+      <div style="display:flex;align-items:center;border-bottom:2px solid #333;">
+        <input type="text" id="batchVerwacht" maxlength="8" oninput="calcTarra()"
+          style="width:130px;border:none;outline:none;background:transparent;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:5px 6px 5px 34px;-webkit-user-select:text;">
+        <span style="font-size:12px;color:#888;padding-right:5px;">g</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <input type="text" id="tarraResult" maxlength="8"
+          style="width:130px;border:none;outline:none;background:#fff;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:5px 6px 5px 34px;color:#2a7a4a;-webkit-text-fill-color:#2a7a4a;">
+        <span style="font-size:12px;color:#2a7a4a;padding-right:5px;font-weight:700;">g</span>
+      </div>
+    </div>
+    <!-- pH en Opbrengst -->
+    <div class="bot" style="page-break-inside:avoid;break-inside:avoid;margin-top:6px;">
+      <div class="bot-row" style="display:flex;">
+        <div class="bot-lbl">pH:</div>
+        <input class="ph" type="text" id="ph" maxlength="5"
+          style="flex:none;border:none;outline:none;background:transparent;font-size:20px;font-weight:700;padding:6px 8px;width:65px;text-align:center;border-right:1px solid #333;">
+        <div class="bot-lbl">Opbrengst:</div>
+        <input type="text" id="opbrengst" maxlength="8" oninput="calcTarra()"
+          style="flex:1;border:none;outline:none;background:transparent;font-size:20px;font-weight:700;font-family:Georgia,serif;padding:6px 8px;text-align:center;min-width:0;">
+      </div>
+    </div>
+  </div>
+
+
+
+  <div style="margin-top:12px;page-break-inside:avoid;break-inside:avoid;">
+    <div class="section-label">pr. info:</div>
+    <div style="border:1px solid #333;border-radius:4px;padding:6px;">
+      <textarea id="prInfo" style="width:100%;border:none;outline:none;resize:vertical;font-family:Arial,sans-serif;font-size:16px;min-height:55px;background:transparent;color:#222;"></textarea>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;page-break-inside:avoid;break-inside:avoid;">
+    <div class="section-label">opmerkingen:</div>
+    <table class="prep-table" id="notesTable"></table>
+    <div class="row-btns" style="margin-top:6px;">
+      <button class="row-btn" onclick="addNotesRow()">+ rij</button>
+      <button class="row-btn" onclick="removeNotesRow()">− rij</button>
+    </div>
+  </div>
+</div>
+
+  <!-- PRINT FOOTER -->
+  <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
+    <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
+    <div style="font-size:10px;color:#555;">Cosmetica Protocol v9.5.1 (optimized) &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  </div>
+
+</div>
+
+<form id="submitForm" action="https://formsubmit.co/eed2a26b859da2fe354ef0a824708830" method="POST" style="display:none;">
+  <input type="hidden" name="_subject" id="f_subject">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="Recept" id="f_recept">
+  <input type="hidden" name="Productnaam" id="f_name">
+  <input type="hidden" name="Datum" id="f_datum">
+  <input type="hidden" name="pH" id="f_ph">
+  <input type="hidden" name="Opbrengst" id="f_opbr">
+  <input type="hidden" name="Ingredienten" id="f_ingr">
+  <input type="hidden" name="Bereiding" id="f_prep">
+  <input type="hidden" name="Pr_Info" id="f_prinfo">
+  <input type="hidden" name="Opmerkingen" id="f_notes">
+  <button type="submit">Verstuur</button>
+</form>
+
+<div id="helpModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="background:#fff;margin:20px auto;max-width:500px;border-radius:12px;padding:24px;position:relative;">
+    <button onclick="document.getElementById('helpModal').style.display='none'"
+      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">×</button>
+    <h2 style="font-family:Impact,sans-serif;color:#c1724a;margin-bottom:16px;font-size:22px;">Handleiding</h2>
+    <h3 style="color:#333;margin:12px 0 6px;">1. Protocol deels invullen</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Vul Fase, %, Ingrediënten, Bereiding en Pr. Info in. Druk op de 💾 Opslaan button. Sla het bestandje op in Google Drive in de map "Protocollen om voor te bereiden"</p>
+
+    <h3 style="color:#333;margin:12px 0 6px;">2. In het lab — protocol bereiden</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 📂 Laden button. Kies het bestandje uit de map "Protocollen om mee te bereiden" in Google Drive. Vul Batch, Tarra, Opbrengst, pH en Datum in.</p>
+
+    <h3 style="color:#333;margin:12px 0 6px;">3. Protocol volledig ingevuld</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 🖨 Afdrukken button om het protocol af te drukken. Druk daarna op de 💾 Opslaan button en sla het op in Google Drive in de map "Afgeronde protocollen"</p>
+
+    <h3 style="color:#333;margin:12px 0 6px;">Spraakinvoer</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Spreek je gegevens in. Druk daarna op de 🎤 Corrigeer tekst button om gesproken woorden naar cijfers te vervangen.</p>
+
+    <div style="margin-top:16px;padding:12px;background:#fff8f5;border-radius:8px;border-left:4px solid #c1724a;">
+      <p style="font-size:13px;color:#c1724a;font-weight:700;">Tip: De bestandsnaam begint automatisch met de productcode!</p>
+    </div>
+  </div>
+</div>
+
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v9.5.1</div>
+
+<!-- SAVE INSTRUCTIONS MODAL -->
+<div id="saveModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+  <div style="background:#fff;margin:20px auto;max-width:460px;border-radius:12px;padding:24px;position:relative;">
+    <button onclick="document.getElementById('saveModal').style.display='none'"
+      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">×</button>
+    <h2 style="font-family:Impact,sans-serif;color:#2a7a4a;margin-bottom:16px;font-size:22px;">💾 Recept opgeslagen!</h2>
+    <p style="font-size:14px;color:#444;margin-bottom:12px;line-height:1.6;">Je recept staat in je <strong>Downloads</strong> map. Sla het op in Google Drive:</p>
+
+    <div style="background:#f5f0eb;border-radius:8px;padding:14px;margin-bottom:12px;">
+      <p style="font-size:13px;font-weight:700;color:#c1724a;margin-bottom:8px;">💾 OPSLAAN naar Drive:</p>
+      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">1</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Open de <strong>Google Drive app</strong></p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">2</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Tik <strong>Delen</strong> → kies <strong>Drive</strong></p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">3</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Pas evt. de naam aan → kies jouw map → <strong>Opslaan</strong></p>
+      </div>
+    </div>
+
+    <div style="background:#f5f0eb;border-radius:8px;padding:14px;margin-bottom:12px;">
+      <p style="font-size:13px;font-weight:700;color:#2a7a4a;margin-bottom:8px;">📂 LADEN uit Drive:</p>
+      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">1</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Tik op <strong>📂 Laden</strong> in het template</p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">2</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Tik <strong>Bladeren</strong> → <strong>Google Drive</strong> → jouw map</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">3</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Tik op je recept → laadt direct in!</p>
+      </div>
+    </div>
+
+    <button onclick="document.getElementById('saveModal').style.display='none'"
+      style="width:100%;margin-top:16px;background:#2a7a4a;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;">
+      Begrepen! ✓
+    </button>
+  </div>
+</div>
+
+<script>
+var cols=[
+  {name:'Fase',w:48,align:'center'},
+  {name:'%',w:40,align:'center'},
+  {name:'Ingredienten',w:130,align:'left'},
+  {name:'g',w:55,align:'center'},
+  {name:'V',w:36,align:'center'},
+  {name:'info',w:80,align:'left'}
+];
+var totalCols=[1,3];
+var ingrRowCount=10,prepRowCount=8,notesRowCount=2;
+var batchSize=100;
+var manualRows={};
+
+function getTS(){return document.getElementById('tableSize').value+'px';}
+function parseNum(v){var n=parseFloat((v||'').toString().replace(',','.'));return isNaN(n)?0:n;}
+
+var replacements=[
+  // Lange Nederlandse getallen eerst
+  [/\bvijfentwintig\b/gi,'25'],[/\bvijftien\b/gi,'15'],[/\bveertien\b/gi,'14'],
+  [/\bdertien\b/gi,'13'],[/\bzestien\b/gi,'16'],[/\bzeventien\b/gi,'17'],
+  [/\bachttien\b/gi,'18'],[/\bnegentien\b/gi,'19'],[/\btwaalf\b/gi,'12'],
+  [/\bdertig\b/gi,'30'],[/\bveertig\b/gi,'40'],[/\bvijftig\b/gi,'50'],
+  [/\bzestig\b/gi,'60'],[/\bzeventig\b/gi,'70'],[/\btachtig\b/gi,'80'],
+  [/\bnegentig\b/gi,'90'],[/\btwintig\b/gi,'20'],[/\bhonderd\b/gi,'100'],
+  [/\belf\b/gi,'11'],[/\btien\b/gi,'10'],
+  // Korte Nederlandse getallen
+  [/\bnegen\b/gi,'9'],[/\bacht\b/gi,'8'],[/\bzeven\b/gi,'7'],
+  [/\bzes\b/gi,'6'],[/\bvijf\b/gi,'5'],[/\bvier\b/gi,'4'],
+  [/\bdrie\b/gi,'3'],[/\btwee\b/gi,'2'],[/\been\b/gi,'1'],[/\bnul\b/gi,'0'],
+  [/\b[eé][eé]n\b/gi,'1'],[/Één/g,'1'],[/één/g,'1'],[/Eén/g,'1'],[/eén/g,'1'],[/EÉN/g,'1'],[/ÉÉN/g,'1'],
+  // Decimalen: "twee komma vijf" -> "2,5"
+  [/\bkomma\b/gi,','],[/\bpunt\b/gi,'.'],
+  // Engelse getallen
+  [/\bnineteen\b/gi,'19'],[/\beighteen\b/gi,'18'],[/\bseventeen\b/gi,'17'],
+  [/\bsixteen\b/gi,'16'],[/\bfifteen\b/gi,'15'],[/\bfourteen\b/gi,'14'],
+  [/\bthirteen\b/gi,'13'],[/\btwelve\b/gi,'12'],[/\beleven\b/gi,'11'],
+  [/\bhundred\b/gi,'100'],[/\bninety\b/gi,'90'],[/\beighty\b/gi,'80'],
+  [/\bseventy\b/gi,'70'],[/\bsixty\b/gi,'60'],[/\bfifty\b/gi,'50'],
+  [/\bforty\b/gi,'40'],[/\bthirty\b/gi,'30'],[/\btwenty\b/gi,'20'],
+  [/\bten\b/gi,'10'],[/\bnine\b/gi,'9'],[/\beight\b/gi,'8'],
+  [/\bseven\b/gi,'7'],[/\bsix\b/gi,'6'],[/\bfive\b/gi,'5'],
+  [/\bfour\b/gi,'4'],[/\bthree\b/gi,'3'],[/\btwo\b/gi,'2'],[/\bone\b/gi,'1'],
+  // Eenheden
+  [/\bgram\b/gi,'g'],[/\bcelsius\b/gi,'C'],[/\bprocent\b/gi,'%'],
+  [/\bcomma\b/gi,','],[/\bdot\b/gi,'.'],[/\bpoint\b/gi,'.'],
+  // Ruimte tussen cijfer en komma opruimen: "2 , 5" -> "2,5"
+  [/(\d+)\s*,\s*(\d+)/g,'$1,$2']
+];
+
+function fixText(){
+  document.querySelectorAll('.template input[type=text],.template textarea').forEach(function(el){
+    var v=el.value;
+    replacements.forEach(function(r){v=v.replace(r[0],r[1]);});
+    el.value=v;
+  });
+  showToast('Tekst gecorrigeerd!');
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+function buildIngrTableWithData(saved){
+  var cg=document.getElementById('colgroup');
+  var head=document.getElementById('ingrHead');
+  var body=document.getElementById('ingrBody');
+  manualRows={};
+  cg.innerHTML='';
+  cols.forEach(function(c){
+    var col=document.createElement('col');col.style.width=c.w+'px';cg.appendChild(col);
+  });
+  var delCol=document.createElement('col');delCol.style.width='28px';cg.appendChild(delCol);
+
+  var hs=document.getElementById('headerSize').value+'px';
+  var headHTML='<tr>';
+  cols.forEach(function(c,i){
+    if(i===3){
+      headHTML+='<th class="del-th" style="min-width:'+c.w+'px;text-align:center;padding:2px 3px;">'
+        +'<div style="font-size:10px;margin-bottom:2px;">g (batch)</div>'
+        +'<input id="batchInput" type="text" value="'+(batchSize||'')+'" placeholder="100"'
+        +' style="width:90%;font-size:12px;font-weight:700;border:1px solid #c1724a;border-radius:4px;'
+        +'text-align:center;padding:2px;background:#fff8f5;outline:none;"'
+        +' oninput="batchSize=parseFloat(this.value.replace(\',\',\'.\'))||0;calcBatch();">'
+        +'<div class="resizer" data-col="'+i+'"></div></th>';
+    } else {
+      headHTML+='<th style="min-width:'+c.w+'px;text-align:'+(c.align||'center')+';font-size:'+hs+';">'
+        +c.name+'<div class="resizer" data-col="'+i+'"></div></th>';
+    }
+  });
+  headHTML+='<th class="del-th" style="width:28px;background:#f0ebe4;border:1px solid #333;"></th></tr>';
+  head.innerHTML=headHTML;
+  body.innerHTML='';
+
+  for(var r=0;r<ingrRowCount;r++){
+    (function(rowIdx){
+      var rowData=saved&&saved[rowIdx]?saved[rowIdx]:[];
+      var tr=document.createElement('tr');
+      cols.forEach(function(c,ci){
+        var td=document.createElement('td');
+        var inp=document.createElement('input');
+        inp.type='text';
+        inp.value=rowData[ci]||'';
+        inp.style.fontSize=getTS();
+        inp.style.textAlign=c.align||'center';
+        if(ci===0){
+          inp.maxLength=1;
+          inp.addEventListener('input',function(){this.value=this.value.toUpperCase().slice(0,1);});
+        } else if(ci===1){
+          inp.addEventListener('input',function(){updateTotals();calcBatch();});
+        } else if(ci===2){
+          inp.addEventListener('input',function(){
+            if(this.value.length>0){
+              var pos=this.selectionStart;
+              this.value=this.value.charAt(0).toUpperCase()+this.value.slice(1);
+              this.setSelectionRange(pos,pos);
+            }
+          });
+        } else if(ci===3){
+          inp.style.background='#fff8f5';inp.style.color='#c1724a';inp.style.fontWeight='600';
+          inp.addEventListener('input',function(){manualGram(this,rowIdx);});
+        } else {
+          inp.addEventListener('input',updateTotals);
+        }
+        td.appendChild(inp);tr.appendChild(td);
+      });
+      var delTd=document.createElement('td');
+      delTd.className='del-td';
+      delTd.style.cssText='border:1px solid #333;padding:0;text-align:center;width:28px;';
+      var delBtn=document.createElement('button');
+      delBtn.className='del-btn';delBtn.textContent='🗑';
+      delBtn.onclick=function(){deleteIngrRow(rowIdx);};
+      delTd.appendChild(delBtn);tr.appendChild(delTd);
+      body.appendChild(tr);
+    })(r);
+  }
+
+  var oldFoot=document.querySelector('#ingrTable tfoot');
+  if(oldFoot)oldFoot.remove();
+  var tfoot=document.createElement('tfoot');
+  var ttr=document.createElement('tr');
+  cols.forEach(function(c,ci){
+    var td=document.createElement('td');
+    td.style.cssText='background:#f0ebe4;font-weight:700;font-size:12px;text-align:center;padding:3px 5px;border:1px solid #333;';
+    if(ci===0){td.textContent='Totaal:';td.style.fontStyle='italic';td.style.color='#666';}
+    else if(totalCols.indexOf(ci)>=0){td.id='total_col_'+ci;td.style.color='#c1724a';}
+    ttr.appendChild(td);
+  });
+  var emptyTd=document.createElement('td');
+  emptyTd.className='del-td';
+  emptyTd.style.cssText='background:#f0ebe4;border:1px solid #333;';
+  ttr.appendChild(emptyTd);
+  tfoot.appendChild(ttr);
+  document.getElementById('ingrTable').appendChild(tfoot);
+  applyResizers();calcBatch();updateTotals();applyHeaderSize();
+}
+
+function buildIngrTable(){
+  var saved=[];
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var row=[];tr.querySelectorAll('input').forEach(function(i){row.push(i.value);});saved.push(row);
+  });
+  buildIngrTableWithData(saved);
+}
+
+function deleteIngrRow(rowIndex){
+  if(ingrRowCount<=1)return;
+  var rows=Array.from(document.querySelectorAll('#ingrBody tr'));
+  var saved=[];
+  rows.forEach(function(tr){
+    var row=[];tr.querySelectorAll('input').forEach(function(i){row.push(i.value);});saved.push(row);
+  });
+  saved.splice(rowIndex,1);
+  ingrRowCount--;
+  buildIngrTableWithData(saved);
+}
+
+function buildPrepTable(){
+  var t=document.getElementById('prepTable');
+  var saved=[];t.querySelectorAll('input').forEach(function(i){saved.push(i.value);});
+  t.innerHTML='';
+  for(var r=0;r<prepRowCount;r++){
+    var tr=document.createElement('tr');var td=document.createElement('td');
+    var inp=document.createElement('input');inp.type='text';inp.value=saved[r]||'';inp.style.fontSize=getTS();
+    td.appendChild(inp);tr.appendChild(td);t.appendChild(tr);
+  }
+}
+
+function buildNotesTable(){
+  var t=document.getElementById('notesTable');
+  var saved=[];t.querySelectorAll('input').forEach(function(i){saved.push(i.value);});
+  t.innerHTML='';
+  for(var r=0;r<notesRowCount;r++){
+    var tr=document.createElement('tr');var td=document.createElement('td');
+    var inp=document.createElement('input');inp.type='text';inp.value=saved[r]||'';inp.style.fontSize=getTS();
+    td.appendChild(inp);tr.appendChild(td);t.appendChild(tr);
+  }
+}
+
+function updateTotals(){
+  var totals={};
+  totalCols.forEach(function(ci){totals[ci]=0;});
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var inputs=tr.querySelectorAll('input');
+    totalCols.forEach(function(ci){if(inputs[ci])totals[ci]+=parseNum(inputs[ci].value);});
+  });
+  totalCols.forEach(function(ci){
+    var cell=document.getElementById('total_col_'+ci);
+    if(cell){
+      var val=Math.round(totals[ci]*100)/100;
+      cell.textContent=val?(val.toString().replace('.',',')):'' ;
+      if(ci===1){cell.style.color=(val>0&&Math.abs(val-100)<0.01)?'#2a7a4a':'#c1724a';cell.style.fontWeight='700';}
+    }
+  });
+}
+
+function manualGram(inp,rowIdx){manualRows[rowIdx]=true;updateTotals();recalcBatchFromG();}
+
+function recalcBatchFromG(){
+  var rows=document.querySelectorAll('#ingrBody tr');
+  var derivedBatch=0;
+  rows.forEach(function(tr,idx){
+    if(manualRows[idx])return;
+    var inputs=tr.querySelectorAll('input');
+    var pct=parseNum(inputs[1]?inputs[1].value:'');
+    var g=parseNum(inputs[3]?inputs[3].value:'');
+    if(pct>0&&g>0)derivedBatch=Math.round(g/pct*100*100)/100;
+  });
+  if(derivedBatch>0){
+    rows.forEach(function(tr,idx){
+      if(manualRows[idx])return;
+      var inputs=tr.querySelectorAll('input');
+      var pct=parseNum(inputs[1]?inputs[1].value:'');
+      if(pct>0&&inputs[3])inputs[3].value=(Math.round(pct/100*derivedBatch*100)/100).toString().replace('.',',');
+    });
+  }
+  updateTotals();
+}
+
+function calcBatch(){
+  if(!batchSize){
+    document.querySelectorAll('#ingrBody tr').forEach(function(tr,idx){
+      if(manualRows[idx])return;
+      var inputs=tr.querySelectorAll('input');
+      if(inputs[3])inputs[3].value='';
+    });
+    updateTotals();return;
+  }
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr,idx){
+    if(manualRows[idx])return;
+    var inputs=tr.querySelectorAll('input');
+    if(!inputs[1]||!inputs[3])return;
+    var pct=parseNum(inputs[1].value);
+    if(pct>0)inputs[3].value=(Math.round(pct/100*batchSize*100)/100).toString().replace('.',',');
+    else inputs[3].value='';
+  });
+  updateTotals();
+}
+
+function calcPercFromGram(){
+  var rows=document.querySelectorAll('#ingrBody tr');
+  var total=0;
+  rows.forEach(function(tr){
+    var inputs=tr.querySelectorAll('input');
+    if(inputs[3])total+=parseNum(inputs[3].value);
+  });
+  if(total<=0){showToast('Vul eerst grammen in!');return;}
+  rows.forEach(function(tr){
+    var inputs=tr.querySelectorAll('input');
+    if(!inputs[3]||!inputs[1])return;
+    var g=parseNum(inputs[3].value);
+    if(g>0){
+      var pct=Math.round(g/total*10000)/100;
+      inputs[1].value=pct.toString().replace('.',',');
+    }
+  });
+  updateTotals();
+  showToast('Percentages berekend!');
+}
+
+function sortByFase(){
+  var rows=Array.from(document.querySelectorAll('#ingrBody tr'));
+  var data=rows.map(function(tr){
+    var row=[];tr.querySelectorAll('input').forEach(function(i){row.push(i.value);});return row;
+  });
+  var filled=data.filter(function(r){return r[0].trim()!=='';});
+  var empty=data.filter(function(r){return r[0].trim()==='';});
+  filled.sort(function(a,b){
+    var fa=a[0].trim().toUpperCase();var fb=b[0].trim().toUpperCase();
+    if(fa<fb)return -1;if(fa>fb)return 1;
+    return parseNum(b[1])-parseNum(a[1]);
+  });
+  var sorted=filled.concat(empty);
+  rows.forEach(function(tr,i){
+    var inputs=tr.querySelectorAll('input');
+    var rowData=sorted[i]||[];
+    inputs.forEach(function(inp,ci){if(ci===3)return;inp.value=rowData[ci]||'';});
+  });
+  manualRows={};calcBatch();updateTotals();showToast('Gesorteerd op fase!');
+}
+
+function addIngrRow(){ingrRowCount++;buildIngrTable();}
+function addPrepRow(){prepRowCount++;buildPrepTable();}
+function removePrepRow(){if(prepRowCount>1){prepRowCount--;buildPrepTable();}}
+function addNotesRow(){notesRowCount++;buildNotesTable();}
+function removeNotesRow(){if(notesRowCount>1){notesRowCount--;buildNotesTable();}}
+
+function applyResizers(){
+  document.querySelectorAll('.resizer').forEach(function(r){
+    r.onmousedown=function(e){
+      e.preventDefault();
+      var ci=parseInt(r.dataset.col),startX=e.clientX,startW=cols[ci].w;
+      var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.clientX-startX));buildIngrTable();};
+      var onUp=function(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
+      document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+    };
+    r.ontouchstart=function(e){
+      var ci=parseInt(r.dataset.col),startX=e.touches[0].clientX,startW=cols[ci].w;
+      var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.touches[0].clientX-startX));buildIngrTable();};
+      var onEnd=function(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);};
+      document.addEventListener('touchmove',onMove);document.addEventListener('touchend',onEnd);
+    };
+  });
+}
+
+function applyNameStyle(){
+  var inp=document.getElementById('productName');
+  inp.style.fontFamily=document.getElementById('nameFontSel').value;
+  inp.style.fontSize=document.getElementById('nameSize').value+'px';
+  var bold=document.getElementById('nameBold');
+  inp.style.fontWeight=(bold&&bold.checked)?'700':'400';
+  inp.style.color='#fff';
+}
+
+function applyHeaderSize(){
+  var sz=document.getElementById('headerSize').value+'px';
+  document.querySelectorAll('#ingrHead th').forEach(function(th){
+    if(!th.querySelector('#batchInput'))th.style.fontSize=sz;
+  });
+}
+
+function clearAll(){
+  var els=document.querySelectorAll('.template input[type=text],.template textarea');
+  els.forEach(function(el){el.value='';});
+  document.getElementById('receptWord').value='';
+  manualRows={};
+  batchSize=100;
+  var bi=document.getElementById('batchInput');
+  if(bi)bi.value='100';
+  var co=document.getElementById('conclusie');if(co)co.value='';
+  var pi=document.getElementById('prInfo');if(pi)pi.value='';
+  updateTotals();
+  showToast('Leeggemaakt!');
+}
+
+function collectData(){
+  var ingrRows=[];
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var row=[];tr.querySelectorAll('input').forEach(function(i){row.push(i.value);});ingrRows.push(row);
+  });
+  var prepRows=[];document.querySelectorAll('#prepTable input').forEach(function(i){prepRows.push(i.value);});
+  var notesRows=[];document.querySelectorAll('#notesTable input').forEach(function(i){notesRows.push(i.value);});
+  return{
+    recept:document.getElementById('receptWord').value,
+    name:document.getElementById('productName').value,
+    datum:document.getElementById('datum').value,
+    ph:document.getElementById('ph').value,
+    tarra:document.getElementById('tarra').value,
+    batchVerwacht:document.getElementById('batchVerwacht')?document.getElementById('batchVerwacht').value:'',
+    opbr:document.getElementById('opbrengst').value,
+    conclusie:(document.getElementById('conclusie')?document.getElementById('conclusie').value:''),
+    prInfo:document.getElementById('prInfo').value,
+    ff:document.getElementById('nameFontSel').value,
+    sz:document.getElementById('nameSize').value+'px',
+    bold:document.getElementById('nameBold').checked,
+    rs:document.getElementById('receptSize').value+'px',
+    ts:getTS(),
+    ingrRows:ingrRows,prepRows:prepRows,notesRows:notesRows
+  };
+}
+
+function markEmptyRows(){
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var inputs=tr.querySelectorAll('input');
+    var hasData=false;
+    inputs.forEach(function(inp,i){if(i!==3&&inp.value.trim()!=='')hasData=true;});
+    if(hasData){tr.classList.remove('empty-row');}else{tr.classList.add('empty-row');}
+  });
+  document.querySelectorAll('#prepTable tr').forEach(function(tr){
+    var inp=tr.querySelector('input');
+    if(inp&&inp.value.trim()!==''){tr.classList.remove('empty-row');}else{tr.classList.add('empty-row');}
+  });
+  document.querySelectorAll('#notesTable tr').forEach(function(tr){
+    var inp=tr.querySelector('input');
+    if(inp&&inp.value.trim()!==''){tr.classList.remove('empty-row');}else{tr.classList.add('empty-row');}
+  });
+}
+
+function doPrint(){
+  markEmptyRows();
+  setTimeout(function(){
+    window.print();
+    setTimeout(function(){
+      document.querySelectorAll('.empty-row').forEach(function(tr){
+        tr.classList.remove('empty-row');
+      });
+    },2000);
+  },300);
+}
+
+function doScreenshot(){
+  var el=document.getElementById('template');
+  document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='hidden';});
+  html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){
+    document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='';});
+    var link=document.createElement('a');
+    link.download=(document.getElementById('productName').value||'cosmetica').toLowerCase().replace(/\s+/g,'-')+'.png';
+    link.href=canvas.toDataURL('image/png');link.click();
+    showToast('Screenshot opgeslagen!');
+  }).catch(function(){
+    document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='';});
+    showToast('Screenshot mislukt');
+  });
+}
+
+function saveData(){
+  try {
+    var d=collectData();
+    d.receptSizeVal=document.getElementById('receptSize').value;
+    d.nameFontSelVal=document.getElementById('nameFontSel').value;
+    d.nameBoldVal=document.getElementById('nameBold').checked;
+    d.nameSizeVal=document.getElementById('nameSize').value;
+    d.tableSizeVal=document.getElementById('tableSize').value;
+    d.headerSizeVal=document.getElementById('headerSize').value;
+    d.ingrRowCount=ingrRowCount;
+    d.prepRowCount=prepRowCount;
+    d.notesRowCount=notesRowCount;
+    d.cols=cols;
+    d.batchSize=batchSize;
+    var json=JSON.stringify(d);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var code=(d.recept||'').replace(/[^a-zA-Z0-9]/g,'');
+    var naam=(d.name||'protocol').replace(/[^a-zA-Z0-9\-_\s]/g,'').replace(/\s+/g,'-').trim();
+    var fname=code?(code+'-'+naam):naam;
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=fname+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setTimeout(function(){
+      var modal=document.getElementById('saveModal');
+      if(modal)modal.style.display='block';
+    },500);
+  } catch(err) {
+    showToast('Fout bij opslaan: '+err.message);
+  }
+}
+
+function loadData(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      if(d.cols)cols=d.cols;
+      if(d.ingrRowCount)ingrRowCount=d.ingrRowCount;
+      if(d.prepRowCount)prepRowCount=d.prepRowCount;
+      if(d.notesRowCount)notesRowCount=d.notesRowCount;
+      if(d.batchSize)batchSize=d.batchSize;
+      if(d.receptSizeVal){document.getElementById('receptSize').value=d.receptSizeVal;document.getElementById('receptSizeVal').textContent=d.receptSizeVal+'px';document.getElementById('receptWord').style.fontSize=d.receptSizeVal+'px';}
+      if(d.nameFontSelVal)document.getElementById('nameFontSel').value=d.nameFontSelVal;
+      if(d.nameBoldVal!==undefined)document.getElementById('nameBold').checked=d.nameBoldVal;
+      if(d.nameSizeVal){document.getElementById('nameSize').value=d.nameSizeVal;document.getElementById('nameSizeVal').textContent=d.nameSizeVal+'px';}
+      if(d.tableSizeVal){document.getElementById('tableSize').value=d.tableSizeVal;document.getElementById('tableSizeVal').textContent=d.tableSizeVal+'px';}
+      if(d.headerSizeVal){document.getElementById('headerSize').value=d.headerSizeVal;document.getElementById('headerSizeVal').textContent=d.headerSizeVal+'px';}
+      buildIngrTableWithData(d.ingrRows||[]);buildPrepTable();buildNotesTable();applyNameStyle();
+      if(d.recept)document.getElementById('receptWord').value=d.recept;
+      if(d.name)document.getElementById('productName').value=d.name;
+      if(d.datum){document.getElementById('datum').value=d.datum;var dd=document.getElementById('datumDisplayFixed');if(dd)dd.textContent=d.datum;}
+      if(d.ph)document.getElementById('ph').value=d.ph;
+      if(d.tarra)document.getElementById('tarra').value=d.tarra;
+      if(d.batchVerwacht){var bv=document.getElementById('batchVerwacht');if(bv)bv.value=d.batchVerwacht;}
+      calcTarra();
+      if(d.opbr)document.getElementById('opbrengst').value=d.opbr;
+      if(d.conclusie)document.getElementById('conclusie').value=d.conclusie;
+      if(d.prInfo)document.getElementById('prInfo').value=d.prInfo;
+      if(d.prepRows){var pi=document.querySelectorAll('#prepTable input');d.prepRows.forEach(function(v,i){if(pi[i])pi[i].value=v;});}
+      if(d.notesRows){var ni=document.querySelectorAll('#notesTable input');d.notesRows.forEach(function(v,i){if(ni[i])ni[i].value=v;});}
+      var bi=document.getElementById('batchInput');if(bi&&batchSize)bi.value=batchSize;
+      updateTotals();calcBatch();showToast('Geladen!');
+    }catch(err){showToast('Fout bij laden!');}
+  };
+  reader.readAsText(file);event.target.value='';
+}
+
+function submitForm(){
+  var d=collectData();
+  document.getElementById('f_subject').value='Cosmetica Protocol: '+(d.name||d.recept);
+  document.getElementById('f_recept').value=d.recept;
+  document.getElementById('f_name').value=d.name;
+  document.getElementById('f_datum').value=d.datum;
+  document.getElementById('f_ph').value=d.ph;
+  document.getElementById('f_opbr').value=d.opbr;
+  var ingrText=cols.map(function(c){return c.name;}).join(' | ')+'\n'
+    +d.ingrRows.filter(function(r){return r.some(function(v){return v;});}).map(function(r){return r.join(' | ');}).join('\n');
+  document.getElementById('f_ingr').value=ingrText;
+  document.getElementById('f_prep').value=d.prepRows.filter(function(v){return v;}).map(function(v,i){return(i+1)+'. '+v;}).join('\n');
+  document.getElementById('f_prinfo').value=d.prInfo;
+  document.getElementById('f_notes').value=d.notesRows.filter(function(v){return v;}).join('\n');
+  document.getElementById('submitForm').submit();
+}
+
+function showHelp(){document.getElementById('helpModal').style.display='block';}
+
+function calcTarra(){
+  var tarra=parseNum(document.getElementById('tarra').value);
+  var batch=parseNum(document.getElementById('batchVerwacht').value);
+  var el=document.getElementById('tarraResult');
+  if(tarra>0&&batch>0){
+    el.value=(Math.round((tarra+batch)*100)/100).toString().replace('.',',');
+  } else if(tarra===0&&batch===0){
+    el.value='';
+  }
+}
+
+buildIngrTableWithData([]);
+buildPrepTable();
+buildNotesTable();
+applyNameStyle();
+calcBatch();
+document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize='17px';});
+applyHeaderSize();
+</script>
+
+</body>
+</html>
