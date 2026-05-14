@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cosmetica Protocol v9.6</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -25,7 +24,6 @@ input[type=range]{flex:1;min-width:50px;accent-color:#c1724a;}
 .btn-load{background:#c14a7a;color:#fff;}
 .btn-clear{background:#eee;color:#666;border:1px solid #ccc;}
 .btn-help{background:#888;color:#fff;padding:8px 14px;font-size:16px;font-weight:900;}
-.btn-screenshot{background:#555;color:#fff;}
 .template{background:#fff;border:1.5px solid #333;border-radius:12px;padding:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
 .header-box{display:flex;border:2px solid #333;border-radius:8px;overflow:hidden;margin-bottom:14px;align-items:stretch;}
 .header-recept-wrap{display:flex;align-items:center;padding:6px 10px;background:#fff;border-right:2px solid #333;white-space:nowrap;width:110px;flex:none;}
@@ -231,31 +229,39 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
       <button class="row-btn" onclick="removeNotesRow()">− rij</button>
     </div>
   </div>
+
+  <div style="margin-top:12px;">
+    <div class="section-label">foto's:</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+      <div style="flex:1;min-width:140px;max-width:48%;">
+        <div id="foto1wrap" style="border:1.5px dashed #ccc;border-radius:8px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;cursor:pointer;" onclick="document.getElementById('fotoInput1').click()">
+          <img id="foto1" src="" style="display:none;max-width:100%;max-height:200px;border-radius:6px;">
+          <span id="foto1txt" style="color:#bbb;font-size:13px;">+ foto 1</span>
+        </div>
+        <input type="file" id="fotoInput1" accept="image/*" style="display:none;" onchange="loadFoto(event,1)">
+        <button class="row-btn" style="margin-top:4px;width:100%;" onclick="clearFoto(1)">🗑 foto 1</button>
+      </div>
+      <div style="flex:1;min-width:140px;max-width:48%;">
+        <div id="foto2wrap" style="border:1.5px dashed #ccc;border-radius:8px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;cursor:pointer;" onclick="document.getElementById('fotoInput2').click()">
+          <img id="foto2" src="" style="display:none;max-width:100%;max-height:200px;border-radius:6px;">
+          <span id="foto2txt" style="color:#bbb;font-size:13px;">+ foto 2</span>
+        </div>
+        <input type="file" id="fotoInput2" accept="image/*" style="display:none;" onchange="loadFoto(event,2)">
+        <button class="row-btn" style="margin-top:4px;width:100%;" onclick="clearFoto(2)">🗑 foto 2</button>
+      </div>
+    </div>
+  </div>
 </div>
 
   <!-- PRINT FOOTER -->
   <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
-    <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
+    <div style="font-size:10px;color:#555;">https:
     <div style="font-size:10px;color:#555;">Cosmetica Protocol v9.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
   </div>
 
 </div>
 
-<form id="submitForm" action="https://formsubmit.co/eed2a26b859da2fe354ef0a824708830" method="POST" style="display:none;">
-  <input type="hidden" name="_subject" id="f_subject">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="Recept" id="f_recept">
-  <input type="hidden" name="Productnaam" id="f_name">
-  <input type="hidden" name="Datum" id="f_datum">
-  <input type="hidden" name="pH" id="f_ph">
-  <input type="hidden" name="Opbrengst" id="f_opbr">
-  <input type="hidden" name="Ingredienten" id="f_ingr">
-  <input type="hidden" name="Bereiding" id="f_prep">
-  <input type="hidden" name="Pr_Info" id="f_prinfo">
-  <input type="hidden" name="Opmerkingen" id="f_notes">
-  <button type="submit">Verstuur</button>
-</form>
+
 
 <div id="helpModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
   <div style="background:#fff;margin:20px auto;max-width:500px;border-radius:12px;padding:24px;position:relative;">
@@ -332,9 +338,9 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 <script>
 var cols=[
   {name:'Fase',w:48,align:'center'},
-  {name:'%',w:40,align:'center'},
+  {name:'%',w:75,align:'center',fixed:true},
   {name:'Ingredienten',w:130,align:'left'},
-  {name:'g',w:55,align:'center'},
+  {name:'g',w:75,align:'center',fixed:true},
   {name:'V',w:36,align:'center'},
   {name:'info',w:80,align:'left'}
 ];
@@ -347,7 +353,7 @@ function getTS(){return document.getElementById('tableSize').value+'px';}
 function parseNum(v){var n=parseFloat((v||'').toString().replace(',','.'));return isNaN(n)?0:n;}
 
 var replacements=[
-  // Lange Nederlandse getallen eerst
+  
   [/\bvijfentwintig\b/gi,'25'],[/\bvijftien\b/gi,'15'],[/\bveertien\b/gi,'14'],
   [/\bdertien\b/gi,'13'],[/\bzestien\b/gi,'16'],[/\bzeventien\b/gi,'17'],
   [/\bachttien\b/gi,'18'],[/\bnegentien\b/gi,'19'],[/\btwaalf\b/gi,'12'],
@@ -355,14 +361,14 @@ var replacements=[
   [/\bzestig\b/gi,'60'],[/\bzeventig\b/gi,'70'],[/\btachtig\b/gi,'80'],
   [/\bnegentig\b/gi,'90'],[/\btwintig\b/gi,'20'],[/\bhonderd\b/gi,'100'],
   [/\belf\b/gi,'11'],[/\btien\b/gi,'10'],
-  // Korte Nederlandse getallen
+  
   [/\bnegen\b/gi,'9'],[/\bacht\b/gi,'8'],[/\bzeven\b/gi,'7'],
   [/\bzes\b/gi,'6'],[/\bvijf\b/gi,'5'],[/\bvier\b/gi,'4'],
   [/\bdrie\b/gi,'3'],[/\btwee\b/gi,'2'],[/\been\b/gi,'1'],[/\bnul\b/gi,'0'],
   [/\b[eé][eé]n\b/gi,'1'],[/Één/g,'1'],[/één/g,'1'],[/Eén/g,'1'],[/eén/g,'1'],[/EÉN/g,'1'],[/ÉÉN/g,'1'],
-  // Decimalen: "twee komma vijf" -> "2,5"
+  
   [/\bkomma\b/gi,','],[/\bpunt\b/gi,'.'],
-  // Engelse getallen
+  
   [/\bnineteen\b/gi,'19'],[/\beighteen\b/gi,'18'],[/\bseventeen\b/gi,'17'],
   [/\bsixteen\b/gi,'16'],[/\bfifteen\b/gi,'15'],[/\bfourteen\b/gi,'14'],
   [/\bthirteen\b/gi,'13'],[/\btwelve\b/gi,'12'],[/\beleven\b/gi,'11'],
@@ -372,10 +378,10 @@ var replacements=[
   [/\bten\b/gi,'10'],[/\bnine\b/gi,'9'],[/\beight\b/gi,'8'],
   [/\bseven\b/gi,'7'],[/\bsix\b/gi,'6'],[/\bfive\b/gi,'5'],
   [/\bfour\b/gi,'4'],[/\bthree\b/gi,'3'],[/\btwo\b/gi,'2'],[/\bone\b/gi,'1'],
-  // Eenheden
+  
   [/\bgram\b/gi,'g'],[/\bcelsius\b/gi,'C'],[/\bprocent\b/gi,'%'],
   [/\bcomma\b/gi,','],[/\bdot\b/gi,'.'],[/\bpoint\b/gi,'.'],
-  // Ruimte tussen cijfer en komma opruimen: "2 , 5" -> "2,5"
+  
   [/(\d+)\s*,\s*(\d+)/g,'$1,$2']
 ];
 
@@ -602,13 +608,18 @@ function calcPercFromGram(){
     var inputs=tr.querySelectorAll('input');
     if(!inputs[3]||!inputs[1])return;
     var g=parseNum(inputs[3].value);
-    if(g>0){
-      var pct=Math.round(g/total*10000)/100;
-      inputs[1].value=pct.toString().replace('.',',');
+    if(g<=0)return;
+    var pct=parseNum(inputs[1].value);
+    var expectedG=pct>0?Math.round(pct/100*total*100)/100:0;
+    var actualG=Math.round(g*100)/100;
+    
+    if(pct===0||Math.abs(expectedG-actualG)>0.01){
+      var newPct=Math.round(g/total*10000)/100;
+      inputs[1].value=newPct.toString().replace('.',',');
     }
   });
   updateTotals();
-  showToast('Percentages berekend!');
+  showToast('% bijgewerkt!');
 }
 
 function sortByFase(){
@@ -640,15 +651,17 @@ function removeNotesRow(){if(notesRowCount>1){notesRowCount--;buildNotesTable();
 
 function applyResizers(){
   document.querySelectorAll('.resizer').forEach(function(r){
+    var ci=parseInt(r.dataset.col);
+    if(cols[ci]&&cols[ci].fixed){r.style.display='none';return;}
     r.onmousedown=function(e){
       e.preventDefault();
-      var ci=parseInt(r.dataset.col),startX=e.clientX,startW=cols[ci].w;
+      var startX=e.clientX,startW=cols[ci].w;
       var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.clientX-startX));buildIngrTable();};
       var onUp=function(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
       document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
     };
     r.ontouchstart=function(e){
-      var ci=parseInt(r.dataset.col),startX=e.touches[0].clientX,startW=cols[ci].w;
+      var startX=e.touches[0].clientX,startW=cols[ci].w;
       var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.touches[0].clientX-startX));buildIngrTable();};
       var onEnd=function(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);};
       document.addEventListener('touchmove',onMove);document.addEventListener('touchend',onEnd);
@@ -673,19 +686,20 @@ function applyHeaderSize(){
 }
 
 function clearAll(){
-  // no confirm() - blocked by iframe in Tiiny.host
-  // clear ALL inputs and textareas in template
+  
+  
   var els=document.querySelectorAll('.template input[type=text],.template textarea');
   els.forEach(function(el){el.value='';});
-  // reset recept word
+  
   document.getElementById('receptWord').value='';
-  // reset batch
+  
   manualRows={};
   batchSize=100;
   var bi=document.getElementById('batchInput');
   if(bi)bi.value='100';
-  // also clear conclusie and prInfo explicitly
+  
   var co=document.getElementById('conclusie');if(co)co.value='';
+  clearFoto(1);clearFoto(2);
   var pi=document.getElementById('prInfo');if(pi)pi.value='';
   updateTotals();
   showToast('Leeggemaakt!');
@@ -709,6 +723,8 @@ function collectData(){
     conclusie:(document.getElementById('conclusie')?document.getElementById('conclusie').value:''),
     prInfo:document.getElementById('prInfo').value,
     ff:document.getElementById('nameFontSel').value,
+    foto1:document.getElementById('foto1')?document.getElementById('foto1').src:'',
+    foto2:document.getElementById('foto2')?document.getElementById('foto2').src:'',
     sz:document.getElementById('nameSize').value+'px',
     bold:document.getElementById('nameBold').checked,
     rs:document.getElementById('receptSize').value+'px',
@@ -736,10 +752,10 @@ function markEmptyRows(){
 
 function doPrint(){
   markEmptyRows();
-  // Wait for CSS to apply before printing
+  
   setTimeout(function(){
     window.print();
-    // Restore empty rows after print
+    
     setTimeout(function(){
       document.querySelectorAll('.empty-row').forEach(function(tr){
         tr.classList.remove('empty-row');
@@ -748,20 +764,7 @@ function doPrint(){
   },300);
 }
 
-function doScreenshot(){
-  var el=document.getElementById('template');
-  document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='hidden';});
-  html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(canvas){
-    document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='';});
-    var link=document.createElement('a');
-    link.download=(document.getElementById('productName').value||'cosmetica').toLowerCase().replace(/\s+/g,'-')+'.png';
-    link.href=canvas.toDataURL('image/png');link.click();
-    showToast('Screenshot opgeslagen!');
-  }).catch(function(){
-    document.querySelectorAll('.row-btns,.del-btn,.del-td,.del-th').forEach(function(e){e.style.visibility='';});
-    showToast('Screenshot mislukt');
-  });
-}
+
 
 function saveData(){
   try {
@@ -827,6 +830,8 @@ function loadData(event){
       if(d.opbr)document.getElementById('opbrengst').value=d.opbr;
       if(d.conclusie)document.getElementById('conclusie').value=d.conclusie;
       if(d.prInfo)document.getElementById('prInfo').value=d.prInfo;
+    if(d.foto1&&d.foto1.length>5){var f1=document.getElementById('foto1');var t1=document.getElementById('foto1txt');if(f1){f1.src=d.foto1;f1.style.display='block';if(t1)t1.style.display='none';}}
+    if(d.foto2&&d.foto2.length>5){var f2=document.getElementById('foto2');var t2=document.getElementById('foto2txt');if(f2){f2.src=d.foto2;f2.style.display='block';if(t2)t2.style.display='none';}}
       if(d.prepRows){var pi=document.querySelectorAll('#prepTable input');d.prepRows.forEach(function(v,i){if(pi[i])pi[i].value=v;});}
       if(d.notesRows){var ni=document.querySelectorAll('#notesTable input');d.notesRows.forEach(function(v,i){if(ni[i])ni[i].value=v;});}
       var bi=document.getElementById('batchInput');if(bi&&batchSize)bi.value=batchSize;
@@ -836,26 +841,11 @@ function loadData(event){
   reader.readAsText(file);event.target.value='';
 }
 
-function submitForm(){
-  var d=collectData();
-  document.getElementById('f_subject').value='Cosmetica Protocol: '+(d.name||d.recept);
-  document.getElementById('f_recept').value=d.recept;
-  document.getElementById('f_name').value=d.name;
-  document.getElementById('f_datum').value=d.datum;
-  document.getElementById('f_ph').value=d.ph;
-  document.getElementById('f_opbr').value=d.opbr;
-  var ingrText=cols.map(function(c){return c.name;}).join(' | ')+'\n'
-    +d.ingrRows.filter(function(r){return r.some(function(v){return v;});}).map(function(r){return r.join(' | ');}).join('\n');
-  document.getElementById('f_ingr').value=ingrText;
-  document.getElementById('f_prep').value=d.prepRows.filter(function(v){return v;}).map(function(v,i){return(i+1)+'. '+v;}).join('\n');
-  document.getElementById('f_prinfo').value=d.prInfo;
-  document.getElementById('f_notes').value=d.notesRows.filter(function(v){return v;}).join('\n');
-  document.getElementById('submitForm').submit();
-}
+
 
 function showHelp(){document.getElementById('helpModal').style.display='block';}
 
-// ── TARRA CALCULATION ──────────────────────────────────────────
+
 function calcTarra(){
   var tarra=parseNum(document.getElementById('tarra').value);
   var batch=parseNum(document.getElementById('batchVerwacht').value);
@@ -865,6 +855,41 @@ function calcTarra(){
   } else if(tarra===0&&batch===0){
     el.value='';
   }
+}
+
+
+function loadFoto(event, num){
+  var file=event.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      
+      var canvas=document.createElement('canvas');
+      var max=400;
+      var w=img.width,h=img.height;
+      if(w>h){if(w>max){h=Math.round(h*max/w);w=max;}}
+      else{if(h>max){w=Math.round(w*max/h);h=max;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      var dataUrl=canvas.toDataURL('image/jpeg',0.7);
+      var el=document.getElementById('foto'+num);
+      var txt=document.getElementById('foto'+num+'txt');
+      el.src=dataUrl;el.style.display='block';
+      if(txt)txt.style.display='none';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value='';
+}
+
+function clearFoto(num){
+  var el=document.getElementById('foto'+num);
+  var txt=document.getElementById('foto'+num+'txt');
+  el.src='';el.style.display='none';
+  if(txt)txt.style.display='block';
 }
 
 buildIngrTableWithData([]);
