@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v11.8</title>
+<title>Cosmetica Protocol v12.0</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v11.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.0 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v11.8</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.0</div>
 
 <script>
 var isLocked=false;
@@ -787,8 +787,12 @@ function applyHeaderSize(){
 }
 
 function clearAll(){
+  // Eerst ontgrendelen als vergrendeld
+  if(isLocked){isLocked=false;lockCode='';applyLock(false);
+    document.getElementById('lockBtn').textContent='🔒 Vergrendelen';
+    document.getElementById('lockBtn').style.background='#333';}
   var els=document.querySelectorAll('.template input[type=text],.template textarea');
-  els.forEach(function(el){el.value='';});
+  els.forEach(function(el){el.value='';el.readOnly=false;});
   document.getElementById('receptWord').value='';
   manualRows={};
   batchSize=100;
@@ -796,6 +800,9 @@ function clearAll(){
   if(bi)bi.value='100';
   clearFoto(1);clearFoto(2);
   var pi=document.getElementById('prInfo');if(pi)pi.value='';
+  buildIngrTableWithData([]);
+  buildPrepTable();
+  buildNotesTable();
   updateTotals();
   showToast('Leeggemaakt!');
 }
@@ -823,7 +830,8 @@ function collectData(){
     bold:document.getElementById('nameBold').checked,
     rs:document.getElementById('receptSize').value+'px',
     ts:getTS(),
-    ingrRows:ingrRows,prepRows:prepRows,notesRows:notesRows
+    ingrRows:ingrRows,prepRows:prepRows,notesRows:notesRows,
+    isLocked:isLocked,lockCode:lockCode
   };
 }
 
@@ -932,7 +940,16 @@ function loadData(event){
       if(d.prepRows){var pi=document.querySelectorAll('#prepTable input');d.prepRows.forEach(function(v,i){if(pi[i])pi[i].value=v;});}
       if(d.notesRows){var ni=document.querySelectorAll('#notesTable input');d.notesRows.forEach(function(v,i){if(ni[i])ni[i].value=v;});}
       var bi=document.getElementById('batchInput');if(bi&&batchSize)bi.value=batchSize;
-      updateTotals();calcBatch();showToast('Geladen!');
+      updateTotals();calcBatch();
+      // Herstel vergrendeling
+      if(d.isLocked&&d.lockCode){
+        isLocked=true;
+        lockCode=d.lockCode;
+        applyLock(true);
+        document.getElementById('lockBtn').textContent='🔓 Ontgrendelen';
+        document.getElementById('lockBtn').style.background='#c1724a';
+      }
+      showToast('Geladen!');
     }catch(err){showToast('Fout bij laden!');}
   };
   reader.readAsText(file);event.target.value='';
