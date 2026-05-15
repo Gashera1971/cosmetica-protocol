@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.3</title>
+<title>Cosmetica Protocol v12.4</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.3 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.4 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.3</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.4</div>
 
 <script>
 var isLocked=false;
@@ -398,29 +398,29 @@ function confirmUnlock(){
 }
 
 function applyLock(lock){
-  // Alle invoervelden in template readonly
-  document.querySelectorAll('.template input[type=text],.template textarea').forEach(function(el){
+  // Alle inputs en textareas op de pagina readonly — ook dynamisch aangemaakte
+  document.querySelectorAll('input[type=text],input[type=number],textarea').forEach(function(el){
+    // Sla lock modal input en settings inputs over
+    if(el.id==='lockCodeInput')return;
+    if(el.closest('.ctrl'))return;
     el.readOnly=lock;
     el.style.pointerEvents=lock?'none':'';
   });
-  // Batch input
+  // Batch input apart
   var bi=document.getElementById('batchInput');
   if(bi){bi.readOnly=lock;bi.style.pointerEvents=lock?'none':'';}
-  // Row buttons en delete buttons uitschakelen
+  // Row buttons en delete buttons
   document.querySelectorAll('.row-btn,.del-btn').forEach(function(b){
     b.disabled=lock;
     b.style.opacity=lock?'0.3':'1';
     b.style.pointerEvents=lock?'none':'';
   });
-  // Foto upload uitschakelen
+  // Foto upload
   document.querySelectorAll('#fotoInput1,#fotoInput2').forEach(function(el){el.disabled=lock;});
   document.querySelectorAll('#foto1wrap,#foto2wrap').forEach(function(el){
     el.style.pointerEvents=lock?'none':'';
     el.style.cursor=lock?'default':'pointer';
   });
-  // lockCodeInput altijd bewerkbaar!
-  var lci=document.getElementById('lockCodeInput');
-  if(lci){lci.readOnly=false;lci.style.pointerEvents='';}
 }
 var cols=[
   {name:'Fase',w:48,align:'center'},
@@ -804,8 +804,21 @@ function clearAll(){
   var bi=document.getElementById('batchInput');if(bi)bi.value='100';
   clearFoto(1);clearFoto(2);
   buildIngrTableWithData([]);
-  prepRowCount=8;buildPrepTable();
-  notesRowCount=2;buildNotesTable();
+  // Leeg bouwen zonder opgeslagen data
+  var pt=document.getElementById('prepTable');pt.innerHTML='';
+  prepRowCount=8;
+  for(var r=0;r<prepRowCount;r++){
+    var tr=document.createElement('tr');var td=document.createElement('td');
+    var inp=document.createElement('input');inp.type='text';inp.style.fontSize=getTS();
+    td.appendChild(inp);tr.appendChild(td);pt.appendChild(tr);
+  }
+  var nt=document.getElementById('notesTable');nt.innerHTML='';
+  notesRowCount=2;
+  for(var r=0;r<notesRowCount;r++){
+    var tr=document.createElement('tr');var td=document.createElement('td');
+    var inp=document.createElement('input');inp.type='text';inp.style.fontSize=getTS();
+    td.appendChild(inp);tr.appendChild(td);nt.appendChild(tr);
+  }
   updateTotals();
   showToast('Leeggemaakt!');
 }
