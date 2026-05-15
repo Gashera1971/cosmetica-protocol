@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v13.5</title>
+<title>Cosmetica Protocol v13.6</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -267,7 +267,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.5 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -352,7 +352,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.5</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.6</div>
 
 <script>
 var isLocked=false;
@@ -519,7 +519,7 @@ function buildIngrTableWithData(saved){
         +'<input id="batchInput" type="text" value="'+(batchSize||'')+'" placeholder="100"'
         +' style="width:90%;font-size:12px;font-weight:700;border:1px solid #c1724a;border-radius:4px;'
         +'text-align:center;padding:2px;background:#fff8f5;outline:none;"'
-        +' oninput="batchSize=parseFloat(this.value.replace(\',\',\'.\'))||0;calcBatch();">'
+        +' oninput="batchSize=parseFloat(this.value.replace(\',\',\'.\'))||0;calcBatch();var bv=document.getElementById(\'batchVerwacht\');if(bv)bv.value=this.value;calcTarra();">'
         +'<div class="resizer" data-col="'+i+'"></div></th>';
     } else {
       headHTML+='<th style="min-width:'+c.w+'px;text-align:'+(c.align||'center')+';font-size:'+hs+';">'
@@ -915,8 +915,8 @@ function saveData(){
     var code=(d.recept||'').replace(/[^a-zA-Z0-9]/g,'');
     var naam=(d.name||'protocol').replace(/[^a-zA-Z0-9\-_\s]/g,'').replace(/\s+/g,'-').trim();
     var fname=(code?(code+'-'+naam):naam)+'.json';
-    var blob=new Blob([json],{type:'application/json'});
-    var file=new File([blob],fname,{type:'application/json'});
+    var blob=new Blob([json],{type:'application/octet-stream'});
+    var file=new File([blob],fname,{type:'application/octet-stream'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       navigator.share({files:[file],title:fname}).catch(function(){});
     } else {
