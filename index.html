@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v13.6</title>
+<title>Cosmetica Protocol v13.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -267,7 +267,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -352,7 +352,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.6</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.8</div>
 
 <script>
 var isLocked=false;
@@ -915,8 +915,8 @@ function saveData(){
     var code=(d.recept||'').replace(/[^a-zA-Z0-9]/g,'');
     var naam=(d.name||'protocol').replace(/[^a-zA-Z0-9\-_\s]/g,'').replace(/\s+/g,'-').trim();
     var fname=(code?(code+'-'+naam):naam)+'.json';
-    var blob=new Blob([json],{type:'application/octet-stream'});
-    var file=new File([blob],fname,{type:'application/octet-stream'});
+    var blob=new Blob([json],{type:'text/plain'});
+    var file=new File([blob],fname,{type:'text/plain'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       navigator.share({files:[file],title:fname}).catch(function(){});
     } else {
@@ -924,8 +924,9 @@ function saveData(){
       var a=document.createElement('a');
       a.href=url;a.download=fname;
       document.body.appendChild(a);a.click();document.body.removeChild(a);
-      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      setTimeout(function(){URL.revokeObjectURL(url);},2000);
     }
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
     setTimeout(function(){
       var modal=document.getElementById('saveModal');
       if(modal)modal.style.display='block';
@@ -1032,6 +1033,11 @@ buildPrepTable();
 buildNotesTable();
 applyNameStyle();
 calcBatch();
+// Vul batchVerwacht direct bij start
+var bv=document.getElementById('batchVerwacht');
+var bi2=document.getElementById('batchInput');
+if(bv&&bi2&&bi2.value)bv.value=bi2.value;
+calcTarra();
 document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize='17px';});
 applyHeaderSize();
 </script>
