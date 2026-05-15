@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.4</title>
+<title>Cosmetica Protocol v12.6</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.4 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.4</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.6</div>
 
 <script>
 var isLocked=false;
@@ -647,14 +647,14 @@ function recalcBatchFromG(){
     var inputs=tr.querySelectorAll('input');
     var pct=parseNum(inputs[1]?inputs[1].value:'');
     var g=parseNum(inputs[3]?inputs[3].value:'');
-    if(pct>0&&g>0)derivedBatch=Math.round(g/pct*100*100)/100;
+    if(pct>0&&g>0)derivedBatch=g/pct*100;
   });
   if(derivedBatch>0){
     rows.forEach(function(tr,idx){
       if(manualRows[idx])return;
-      var inputs=tr.querySelectorAll('input');
+      var inputs=tr.querySelectorAll('td input');
       var pct=parseNum(inputs[1]?inputs[1].value:'');
-      if(pct>0&&inputs[3])inputs[3].value=(Math.round(pct/100*derivedBatch*100)/100).toString().replace('.',',');
+      if(pct>0&&inputs[3])inputs[3].value=parseFloat((pct/100*derivedBatch).toFixed(4)).toString().replace('.',',');
     });
   }
   updateTotals();
@@ -664,17 +664,17 @@ function calcBatch(){
   if(!batchSize){
     document.querySelectorAll('#ingrBody tr').forEach(function(tr,idx){
       if(manualRows[idx])return;
-      var inputs=tr.querySelectorAll('input');
+      var inputs=tr.querySelectorAll('td input');
       if(inputs[3])inputs[3].value='';
     });
     updateTotals();return;
   }
   document.querySelectorAll('#ingrBody tr').forEach(function(tr,idx){
     if(manualRows[idx])return;
-    var inputs=tr.querySelectorAll('input');
+    var inputs=tr.querySelectorAll('td input');
     if(!inputs[1]||!inputs[3])return;
     var pct=parseNum(inputs[1].value);
-    if(pct>0)inputs[3].value=(Math.round(pct/100*batchSize*100)/100).toString().replace('.',',');
+    if(pct>0)inputs[3].value=parseFloat((pct/100*batchSize).toFixed(4)).toString().replace('.',',');
     else inputs[3].value='';
   });
   updateTotals();
@@ -686,34 +686,27 @@ function calcBatch(){
 // ============================================================
 function calcPercFromGram(){
   var rows=document.querySelectorAll('#ingrBody tr');
-  // Bereken totaal g van ALLE rijen
   var total=0;
   rows.forEach(function(tr){
-    var inputs=tr.querySelectorAll('input');
+    var inputs=tr.querySelectorAll('td input');
     if(inputs[3])total+=parseNum(inputs[3].value);
   });
   if(total<=0){showToast('Vul eerst grammen in!');return;}
-
   var changed=0;
   rows.forEach(function(tr,idx){
-    var inputs=tr.querySelectorAll('input');
+    var inputs=tr.querySelectorAll('td input');
     if(!inputs[3]||!inputs[1])return;
     var g=parseNum(inputs[3].value);
     if(g<=0)return;
     var pct=parseNum(inputs[1].value);
     var isManual=manualRows[idx]||false;
-    // Alleen herberekenen als: geen % ingevuld, OF handmatig gewijzigde g
     if(pct===0||isManual){
       var newPct=g/total*100;
-      // Toon exact, geen onnodige decimalen
       var pctStr=parseFloat(newPct.toFixed(4)).toString().replace('.',',');
       inputs[1].value=pctStr;
       changed++;
     }
-    // Rijen met bestaande % en geen handmatige wijziging: ONAANGEROERD
   });
-
-  // Reset manualRows na verwerking
   manualRows={};
   updateTotals();
   showToast(changed>0?changed+' rij(en) bijgewerkt!':'Niets gewijzigd.');
@@ -899,17 +892,12 @@ function saveData(){
     var naam=(d.name||'protocol').replace(/[^a-zA-Z0-9\-_\s]/g,'').replace(/\s+/g,'-').trim();
     var fname=(code?(code+'-'+naam):naam)+'.json';
     var blob=new Blob([json],{type:'application/json'});
-    var file=new File([blob],fname,{type:'application/json'});
-    // iPhone: gebruik Web Share API met bestand zodat deel button verschijnt
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      navigator.share({files:[file],title:fname}).catch(function(){});
-    } else {
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=url;a.download=fname;
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-      setTimeout(function(){URL.revokeObjectURL(url);},1000);
-    }
+    // Gebruik altijd gewone download link — werkt op alle apparaten
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download=fname;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
     setTimeout(function(){
       var modal=document.getElementById('saveModal');
       if(modal)modal.style.display='block';
