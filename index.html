@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.0</title>
+<title>Cosmetica Protocol v12.1</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.0 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.1 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.0</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.1</div>
 
 <script>
 var isLocked=false;
@@ -398,28 +398,47 @@ function confirmUnlock(){
 }
 
 function applyLock(lock){
-  // Alle invoervelden in template readonly of niet
-  document.querySelectorAll('.template input[type=text],.template textarea').forEach(function(el){
+  // Alle invoervelden readonly
+  document.querySelectorAll('input[type=text],textarea').forEach(function(el){
     el.readOnly=lock;
-    el.style.background=lock?'transparent':'';
-    el.style.cursor=lock?'default':'';
+    el.style.pointerEvents=lock?'none':'';
+    el.style.userSelect=lock?'none':'';
   });
-  // Knoppen in template uitschakelen
-  var btns=document.querySelectorAll('.template button,.row-btn');
-  btns.forEach(function(b){
+  // Alle buttons uitschakelen behalve lockBtn zelf, opslaan, afdrukken, laden
+  document.querySelectorAll('button').forEach(function(b){
+    if(b.id==='lockBtn')return;
+    if(b.classList.contains('btn-print'))return;
+    if(b.classList.contains('btn-save'))return;
+    if(b.classList.contains('btn-load'))return;
     b.disabled=lock;
     b.style.opacity=lock?'0.3':'1';
-    b.style.cursor=lock?'default':'pointer';
+    b.style.pointerEvents=lock?'none':'';
   });
-  // Batch input ook vergrendelen
-  var bi=document.getElementById('batchInput');
-  if(bi){bi.readOnly=lock;bi.style.cursor=lock?'default':'';}
   // Foto upload uitschakelen
   document.querySelectorAll('#fotoInput1,#fotoInput2').forEach(function(el){el.disabled=lock;});
   document.querySelectorAll('#foto1wrap,#foto2wrap').forEach(function(el){
-    el.onclick=lock?null:(el.id==='foto1wrap'?function(){document.getElementById('fotoInput1').click();}:function(){document.getElementById('fotoInput2').click();});
+    el.style.pointerEvents=lock?'none':'';
     el.style.cursor=lock?'default':'pointer';
   });
+  // Overlay over template zodat klikken geblokkeerd is
+  var overlay=document.getElementById('lockOverlay');
+  if(!overlay&&lock){
+    overlay=document.createElement('div');
+    overlay.id='lockOverlay';
+    overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:transparent;';
+    overlay.addEventListener('click',function(e){
+      // Alleen lockBtn en save/print/load doorlaten
+      var target=e.target;
+      if(target.id==='lockBtn'||target.classList.contains('btn-save')||
+         target.classList.contains('btn-print')||target.classList.contains('btn-load')){
+        overlay.style.pointerEvents='none';
+        setTimeout(function(){overlay.style.pointerEvents='auto';},100);
+      }
+    });
+    document.body.appendChild(overlay);
+  } else if(overlay&&!lock){
+    overlay.remove();
+  }
 }
 var cols=[
   {name:'Fase',w:48,align:'center'},
@@ -884,21 +903,10 @@ function saveData(){
     var code=(d.recept||'').replace(/[^a-zA-Z0-9]/g,'');
     var naam=(d.name||'protocol').replace(/[^a-zA-Z0-9\-_\s]/g,'').replace(/\s+/g,'-').trim();
     var fname=code?(code+'-'+naam):naam;
-    // Op iPhone: open de blob URL direct zodat het deelscherm verschijnt met Drive optie
-    var isSafariMobile=/iP(hone|ad|od)/i.test(navigator.userAgent);
-    if(isSafariMobile){
-      var newTab=window.open(url,'_blank');
-      if(!newTab){
-        // Fallback als popup geblokkeerd
-        var a=document.createElement('a');a.href=url;a.download=fname+'.json';
-        document.body.appendChild(a);a.click();document.body.removeChild(a);
-      }
-    } else {
-      var a=document.createElement('a');
-      a.href=url;a.download=fname+'.json';
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-    }
-    URL.revokeObjectURL(url);
+    var a=document.createElement('a');
+    a.href=url;a.download=fname+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
     setTimeout(function(){
       var modal=document.getElementById('saveModal');
       if(modal)modal.style.display='block';
