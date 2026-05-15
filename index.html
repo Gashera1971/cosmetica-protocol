@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.7</title>
+<title>Cosmetica Protocol v12.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -63,6 +63,8 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   tr.empty-row{display:none!important;}
   #datumBalkFixed{page-break-inside:avoid;break-inside:avoid;page-break-after:avoid;}
   td.del-td,th.del-th{display:none!important;}
+  table.ingr{table-layout:fixed;width:100%;}
+  table.ingr td,table.ingr th{overflow:hidden;word-break:break-word;}
   iframe,*[class*="tiiny"],*[id*="tiiny"],*[class*="badge"],*[class*="banner"]{display:none!important;}
   div[style*="position:fixed"]{display:none!important;}
   #foto1wrap:not(:has(img[style*="block"])),
@@ -253,7 +255,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.7 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +340,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.7</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.8</div>
 
 <script>
 var isLocked=false;
@@ -620,8 +622,14 @@ function updateTotals(){
   var totals={};
   totalCols.forEach(function(ci){totals[ci]=0;});
   document.querySelectorAll('#ingrBody tr').forEach(function(tr){
-    var inputs=tr.querySelectorAll('input');
-    totalCols.forEach(function(ci){if(inputs[ci])totals[ci]+=parseNum(inputs[ci].value);});
+    var inputs=tr.querySelectorAll('td input');
+    totalCols.forEach(function(ci){
+      if(inputs[ci]){
+        var v=inputs[ci].value.trim();
+        // Alleen optellen als het puur een getal is (geen letters zoals gtt)
+        if(v&&/^[\d.,]+$/.test(v))totals[ci]+=parseNum(v);
+      }
+    });
   });
   totalCols.forEach(function(ci){
     var cell=document.getElementById('total_col_'+ci);
