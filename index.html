@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.1</title>
+<title>Cosmetica Protocol v12.2</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.1 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.2 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.1</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.2</div>
 
 <script>
 var isLocked=false;
@@ -402,14 +402,12 @@ function applyLock(lock){
   document.querySelectorAll('input[type=text],textarea').forEach(function(el){
     el.readOnly=lock;
     el.style.pointerEvents=lock?'none':'';
-    el.style.userSelect=lock?'none':'';
   });
-  // Alle buttons uitschakelen behalve lockBtn zelf, opslaan, afdrukken, laden
-  document.querySelectorAll('button').forEach(function(b){
-    if(b.id==='lockBtn')return;
-    if(b.classList.contains('btn-print'))return;
-    if(b.classList.contains('btn-save'))return;
-    if(b.classList.contains('btn-load'))return;
+  // Batch input
+  var bi=document.getElementById('batchInput');
+  if(bi){bi.readOnly=lock;bi.style.pointerEvents=lock?'none':'';}
+  // Row buttons en template buttons uitschakelen
+  document.querySelectorAll('.row-btn,.del-btn').forEach(function(b){
     b.disabled=lock;
     b.style.opacity=lock?'0.3':'1';
     b.style.pointerEvents=lock?'none':'';
@@ -420,25 +418,9 @@ function applyLock(lock){
     el.style.pointerEvents=lock?'none':'';
     el.style.cursor=lock?'default':'pointer';
   });
-  // Overlay over template zodat klikken geblokkeerd is
+  // Verwijder overlay als die er is
   var overlay=document.getElementById('lockOverlay');
-  if(!overlay&&lock){
-    overlay=document.createElement('div');
-    overlay.id='lockOverlay';
-    overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:transparent;';
-    overlay.addEventListener('click',function(e){
-      // Alleen lockBtn en save/print/load doorlaten
-      var target=e.target;
-      if(target.id==='lockBtn'||target.classList.contains('btn-save')||
-         target.classList.contains('btn-print')||target.classList.contains('btn-load')){
-        overlay.style.pointerEvents='none';
-        setTimeout(function(){overlay.style.pointerEvents='auto';},100);
-      }
-    });
-    document.body.appendChild(overlay);
-  } else if(overlay&&!lock){
-    overlay.remove();
-  }
+  if(overlay)overlay.remove();
 }
 var cols=[
   {name:'Fase',w:48,align:'center'},
@@ -806,19 +788,21 @@ function applyHeaderSize(){
 }
 
 function clearAll(){
-  // Eerst ontgrendelen als vergrendeld
   if(isLocked){isLocked=false;lockCode='';applyLock(false);
     document.getElementById('lockBtn').textContent='🔒 Vergrendelen';
     document.getElementById('lockBtn').style.background='#333';}
-  var els=document.querySelectorAll('.template input[type=text],.template textarea');
-  els.forEach(function(el){el.value='';el.readOnly=false;});
   document.getElementById('receptWord').value='';
-  manualRows={};
-  batchSize=100;
-  var bi=document.getElementById('batchInput');
-  if(bi)bi.value='100';
-  clearFoto(1);clearFoto(2);
+  document.getElementById('productName').value='';
+  document.getElementById('datum').value='';
+  document.getElementById('ph').value='';
+  document.getElementById('tarra').value='';
+  document.getElementById('batchVerwacht').value='';
+  document.getElementById('opbrengst').value='';
+  document.getElementById('tarraResult').value='';
   var pi=document.getElementById('prInfo');if(pi)pi.value='';
+  manualRows={};batchSize=100;
+  var bi=document.getElementById('batchInput');if(bi)bi.value='100';
+  clearFoto(1);clearFoto(2);
   buildIngrTableWithData([]);
   buildPrepTable();
   buildNotesTable();
