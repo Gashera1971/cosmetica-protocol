@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v12.6</title>
+<title>Cosmetica Protocol v12.7</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -253,7 +253,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v12.7 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -338,7 +338,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.6</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v12.7</div>
 
 <script>
 var isLocked=false;
@@ -424,9 +424,9 @@ function applyLock(lock){
 }
 var cols=[
   {name:'Fase',w:48,align:'center'},
-  {name:'%',w:75,align:'center',fixed:true},
+  {name:'%',w:95,align:'center',fixed:true},
   {name:'Ingredienten',w:130,align:'left'},
-  {name:'g',w:75,align:'center',fixed:true},
+  {name:'g',w:85,align:'center',fixed:true},
   {name:'V',w:36,align:'center'},
   {name:'info',w:80,align:'left'}
 ];
@@ -781,9 +781,8 @@ function applyHeaderSize(){
 }
 
 function clearAll(){
-  if(isLocked){isLocked=false;lockCode='';applyLock(false);
-    document.getElementById('lockBtn').textContent='🔒 Vergrendelen';
-    document.getElementById('lockBtn').style.background='#333';}
+  if(isLocked){showToast('🔒 Ontgrendel eerst!');return;}
+  if(!confirm('Alles leegmaken?'))return;
   document.getElementById('receptWord').value='';
   document.getElementById('productName').value='';
   document.getElementById('datum').value='';
@@ -972,11 +971,21 @@ function loadFoto(event,num){
   if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
-    var el=document.getElementById('foto'+num);
-    var txt=document.getElementById('foto'+num+'txt');
-    el.src=e.target.result;
-    el.style.display='block';
-    if(txt)txt.style.display='none';
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var max=300;
+      var scale=Math.min(max/img.width,max/img.height,1);
+      canvas.width=Math.round(img.width*scale);
+      canvas.height=Math.round(img.height*scale);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      var dataUrl=canvas.toDataURL('image/jpeg',0.5);
+      var el=document.getElementById('foto'+num);
+      var txt=document.getElementById('foto'+num+'txt');
+      el.src=dataUrl;el.style.display='block';
+      if(txt)txt.style.display='none';
+    };
+    img.src=e.target.result;
   };
   reader.readAsDataURL(file);
   event.target.value='';
