@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v13.1</title>
+<title>Cosmetica Protocol v13.4</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -66,6 +66,17 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   .table-wrap{overflow:visible!important;}
   table.ingr{table-layout:auto;width:100%;}
   table.ingr td,table.ingr th{padding:2px 4px;}
+  table.ingr td input,table.ingr th input,#batchInput{
+    display:block!important;
+    border:none!important;
+    background:transparent!important;
+    font-size:inherit!important;
+    font-weight:inherit!important;
+    text-align:center!important;
+    width:100%!important;
+    color:inherit!important;
+    -webkit-text-fill-color:inherit!important;
+  }
   iframe,*[class*="tiiny"],*[id*="tiiny"],*[class*="badge"],*[class*="banner"]{display:none!important;}
   div[style*="position:fixed"]{display:none!important;}
   #foto1wrap:not(:has(img[style*="block"])),
@@ -256,7 +267,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.1 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.4 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -341,7 +352,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.1</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.4</div>
 
 <script>
 var isLocked=false;
@@ -469,7 +480,12 @@ var replacements=[
 ];
 
 function fixText(){
-  document.querySelectorAll('.template input[type=text],.template textarea').forEach(function(el){
+  // Pak alle tekst inputs inclusief dynamisch aangemaakte tabel inputs
+  var els=document.querySelectorAll('input[type=text],textarea');
+  els.forEach(function(el){
+    if(el.id==='lockCodeInput')return;
+    if(el.closest('.ctrl'))return;
+    if(el.readOnly)return;
     var v=el.value;
     replacements.forEach(function(r){v=v.replace(r[0],r[1]);});
     el.value=v;
@@ -498,7 +514,7 @@ function buildIngrTableWithData(saved){
   var headHTML='<tr>';
   cols.forEach(function(c,i){
     if(i===3){
-      headHTML+='<th class="del-th" style="min-width:'+c.w+'px;text-align:center;padding:2px 3px;">'
+      headHTML+='<th style="min-width:'+c.w+'px;text-align:center;padding:2px 3px;">'
         +'<div style="font-size:10px;margin-bottom:2px;">g (batch)</div>'
         +'<input id="batchInput" type="text" value="'+(batchSize||'')+'" placeholder="100"'
         +' style="width:90%;font-size:12px;font-weight:700;border:1px solid #c1724a;border-radius:4px;'
@@ -947,7 +963,7 @@ function loadData(event){
       if(d.prepRows){var pi=document.querySelectorAll('#prepTable input');d.prepRows.forEach(function(v,i){if(pi[i])pi[i].value=v;});}
       if(d.notesRows){var ni=document.querySelectorAll('#notesTable input');d.notesRows.forEach(function(v,i){if(ni[i])ni[i].value=v;});}
       var bi=document.getElementById('batchInput');if(bi&&batchSize)bi.value=batchSize;
-      updateTotals();calcBatch();
+      updateTotals();
       // Herstel vergrendeling
       if(d.isLocked&&d.lockCode){
         isLocked=true;
