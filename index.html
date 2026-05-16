@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v13.8</title>
+<title>Cosmetica Protocol v14.0</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -81,8 +81,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   div[style*="position:fixed"]{display:none!important;}
   #foto1wrap:not(:has(img[style*="block"])),
   #foto2wrap:not(:has(img[style*="block"])){display:none!important;}
-  #foto1wrap:not(:has(img[style*="block"])) ~ button,
-  #foto2wrap:not(:has(img[style*="block"])) ~ button{display:none!important;}
+  .foto-del-btn{display:none!important;}
 }
 </style>
 </head>
@@ -158,8 +157,10 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
     style="background:#333;color:#fff;width:100%;">🔒 Vergrendelen</button>
 </div>
   <div class="header-box">
-    <div class="header-recept-wrap">
-      <input type="text" id="receptWord" placeholder="" style="font-size:28px;color:#222;text-align:center;">
+    <div class="header-recept-wrap" style="width:130px;">
+      <input type="text" id="receptWord" placeholder="" maxlength="7"
+        style="font-size:28px;color:#222;text-align:center;width:100%;"
+        oninput="this.value=this.value.toUpperCase();">
     </div>
     <div class="header-name-wrap">
       <input type="text" id="productName" placeholder="">
@@ -242,7 +243,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
     </div>
   </div>
 
-  <div style="margin-top:12px;">
+  <div id="fotoSectie" style="margin-top:12px;">
     <div class="section-label">foto's:</div>
     <div style="display:flex;gap:10px;margin-top:6px;align-items:flex-start;">
       <div style="width:calc(50% - 5px);flex:none;">
@@ -267,7 +268,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v13.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.0 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -352,7 +353,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v13.8</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.0</div>
 
 <script>
 var isLocked=false;
@@ -542,8 +543,8 @@ function buildIngrTableWithData(saved){
         inp.style.fontSize=getTS();
         inp.style.textAlign=c.align||'center';
         if(ci===0){
-          inp.maxLength=1;
-          inp.addEventListener('input',function(){this.value=this.value.toUpperCase().slice(0,1);});
+          inp.maxLength=2;
+          inp.addEventListener('input',function(){this.value=this.value.toUpperCase().slice(0,2);});
         } else if(ci===1){
           inp.addEventListener('input',function(){updateTotals();calcBatch();});
         } else if(ci===2){
@@ -883,6 +884,14 @@ function markEmptyRows(){
     var inp=tr.querySelector('input');
     if(inp&&inp.value.trim()!==''){tr.classList.remove('empty-row');}else{tr.classList.add('empty-row');}
   });
+  // Verberg foto sectie als beide leeg zijn
+  var f1=document.getElementById('foto1');
+  var f2=document.getElementById('foto2');
+  var fotoSectie=document.getElementById('fotoSectie');
+  if(fotoSectie){
+    var heeftFoto=(f1&&f1.style.display==='block')||(f2&&f2.style.display==='block');
+    fotoSectie.classList.toggle('empty-row',!heeftFoto);
+  }
 }
 
 function doPrint(){
