@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v14.6</title>
+<title>Cosmetica Protocol v14.7</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -269,7 +269,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.7 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -354,7 +354,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.6</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.7</div>
 
 <script>
 var isLocked=false;
@@ -969,6 +969,12 @@ function loadData(event){
       if(cols.length===6&&cols[5]&&cols[5].name==='info'){
         cols.splice(5,0,{name:'gtt',w:65,align:'center',fixed:true});
       }
+      // Overschrijf altijd de vaste breedtes van fixed kolommen
+      cols.forEach(function(c){
+        if(c.name==='%')c.w=110;
+        if(c.name==='g')c.w=85;
+        if(c.name==='gtt')c.w=65;
+      });
       // Fix oude ingrRows zonder gtt kolom — voeg lege gtt waarde in op index 5
       if(d.ingrRows){
         d.ingrRows=d.ingrRows.map(function(row){
