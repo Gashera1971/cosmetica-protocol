@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v14.7</title>
+<title>Cosmetica Protocol v14.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -269,7 +269,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.7 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -354,7 +354,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.7</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.8</div>
 
 <script>
 var isLocked=false;
@@ -440,12 +440,12 @@ function applyLock(lock){
 }
 var cols=[
   {name:'Fase',w:48,align:'center'},
-  {name:'%',w:110,align:'center',fixed:true},
-  {name:'Ingredienten',w:130,align:'left'},
+  {name:'%',w:85,align:'center',fixed:true},
+  {name:'Ingredienten',w:160,align:'left'},
   {name:'g',w:85,align:'center',fixed:true},
   {name:'V',w:36,align:'center'},
-  {name:'gtt',w:65,align:'center',fixed:true},
-  {name:'info',w:80,align:'left'}
+  {name:'gtt',w:55,align:'center',fixed:true},
+  {name:'info',w:70,align:'left'}
 ];
 var totalCols=[1,3];
 var ingrRowCount=10,prepRowCount=8,notesRowCount=2;
@@ -971,9 +971,9 @@ function loadData(event){
       }
       // Overschrijf altijd de vaste breedtes van fixed kolommen
       cols.forEach(function(c){
-        if(c.name==='%')c.w=110;
+        if(c.name==='%')c.w=85;
         if(c.name==='g')c.w=85;
-        if(c.name==='gtt')c.w=65;
+        if(c.name==='gtt')c.w=55;
       });
       // Fix oude ingrRows zonder gtt kolom — voeg lege gtt waarde in op index 5
       if(d.ingrRows){
