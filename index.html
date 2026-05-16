@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v14.8</title>
+<title>Cosmetica Protocol v15.0</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -140,6 +140,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
   <div class="ctrl-row" style="gap:8px;flex-wrap:wrap;">
     <button class="btn btn-fix" onclick="fixText()">🎤 Corrigeer tekst</button>
+    <button class="btn btn-clear" onclick="resetKolommen()">↔ Reset kolommen</button>
     <button class="btn btn-clear" onclick="clearAll()">🗑 Leegmaken</button>
   </div>
   <div class="ctrl-row" style="gap:8px;flex-wrap:wrap;">
@@ -269,7 +270,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.8 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v15.0 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -354,7 +355,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.8</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v15.0</div>
 
 <script>
 var isLocked=false;
@@ -441,7 +442,7 @@ function applyLock(lock){
 var cols=[
   {name:'Fase',w:48,align:'center'},
   {name:'%',w:85,align:'center',fixed:true},
-  {name:'Ingredienten',w:160,align:'left'},
+  {name:'Ingredienten',w:160,align:'left',maxw:300},
   {name:'g',w:85,align:'center',fixed:true},
   {name:'V',w:36,align:'center'},
   {name:'gtt',w:55,align:'center',fixed:true},
@@ -546,7 +547,14 @@ function buildIngrTableWithData(saved){
         inp.style.textAlign=c.align||'center';
         if(ci===0){
           inp.maxLength=2;
-          inp.addEventListener('input',function(){this.value=this.value.toUpperCase().slice(0,2);});
+          inp.addEventListener('input',function(){
+            var v=this.value.toUpperCase();
+            // 1e positie: alleen letters, 2e positie: alleen cijfers
+            var result='';
+            if(v.length>=1)result+=v[0].replace(/[^A-Z]/g,'');
+            if(v.length>=2)result+=v[1].replace(/[^0-9]/g,'');
+            this.value=result;
+          });
         } else if(ci===1){
           inp.addEventListener('input',function(){updateTotals();calcBatch();});
         } else if(ci===2){
@@ -779,13 +787,21 @@ function applyResizers(){
     r.onmousedown=function(e){
       e.preventDefault();
       var startX=e.clientX,startW=cols[ci].w;
-      var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.clientX-startX));buildIngrTable();};
+      var onMove=function(e2){
+        var newW=Math.max(28,startW+(e2.clientX-startX));
+        if(cols[ci].maxw)newW=Math.min(newW,cols[ci].maxw);
+        cols[ci].w=newW;buildIngrTable();
+      };
       var onUp=function(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
       document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
     };
     r.ontouchstart=function(e){
       var startX=e.touches[0].clientX,startW=cols[ci].w;
-      var onMove=function(e2){cols[ci].w=Math.max(28,startW+(e2.touches[0].clientX-startX));buildIngrTable();};
+      var onMove=function(e2){
+        var newW=Math.max(28,startW+(e2.touches[0].clientX-startX));
+        if(cols[ci].maxw)newW=Math.min(newW,cols[ci].maxw);
+        cols[ci].w=newW;buildIngrTable();
+      };
       var onEnd=function(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);};
       document.addEventListener('touchmove',onMove);document.addEventListener('touchend',onEnd);
     };
@@ -806,6 +822,20 @@ function applyHeaderSize(){
   document.querySelectorAll('#ingrHead th').forEach(function(th){
     if(!th.querySelector('#batchInput'))th.style.fontSize=sz;
   });
+}
+
+function resetKolommen(){
+  cols=[
+    {name:'Fase',w:48,align:'center'},
+    {name:'%',w:85,align:'center',fixed:true},
+    {name:'Ingredienten',w:160,align:'left',maxw:300},
+    {name:'g',w:85,align:'center',fixed:true},
+    {name:'V',w:36,align:'center'},
+    {name:'gtt',w:55,align:'center',fixed:true},
+    {name:'info',w:70,align:'left'}
+  ];
+  buildIngrTable();
+  showToast('Kolommen gereset!');
 }
 
 function clearAll(){
@@ -948,7 +978,6 @@ function saveData(){
       document.body.appendChild(a);a.click();document.body.removeChild(a);
       setTimeout(function(){URL.revokeObjectURL(url);},2000);
     }
-    setTimeout(function(){URL.revokeObjectURL(url);},2000);
     setTimeout(function(){
       var modal=document.getElementById('saveModal');
       if(modal)modal.style.display='block';
