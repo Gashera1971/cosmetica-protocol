@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v15.0</title>
+<title>Cosmetica Protocol v15.2</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -66,6 +66,8 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   .table-wrap{overflow:visible!important;}
   table.ingr{table-layout:auto;width:100%;}
   table.ingr td,table.ingr th{padding:2px 4px;}
+  table.ingr td:nth-child(3),table.ingr th:nth-child(3){text-align:left!important;}
+  table.ingr td:nth-child(3) input{text-align:left!important;}
   table.ingr td input,table.ingr th input,#batchInput{
     display:block!important;
     border:none!important;
@@ -270,7 +272,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v15.0 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v15.2 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -355,7 +357,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v15.0</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v15.2</div>
 
 <script>
 var isLocked=false;
@@ -549,14 +551,34 @@ function buildIngrTableWithData(saved){
           inp.maxLength=2;
           inp.addEventListener('input',function(){
             var v=this.value.toUpperCase();
-            // 1e positie: alleen letters, 2e positie: alleen cijfers
             var result='';
-            if(v.length>=1)result+=v[0].replace(/[^A-Z]/g,'');
+            // 1e positie: alleen A t/m F
+            if(v.length>=1)result+=v[0].replace(/[^A-F]/g,'');
+            // 2e positie: alleen cijfer
             if(v.length>=2)result+=v[1].replace(/[^0-9]/g,'');
             this.value=result;
           });
         } else if(ci===1){
-          inp.addEventListener('input',function(){updateTotals();calcBatch();});
+          inp.maxLength=6;
+          inp.addEventListener('input',function(){
+            var v=this.value;
+            // Sta QS toe
+            if(v.toUpperCase()==='QS'||v.toUpperCase()==='Q'){
+              this.value=v.toUpperCase();
+              updateTotals();calcBatch();return;
+            }
+            // Verwijder alles behalve cijfers en komma, geen punt
+            v=v.replace(/[^0-9,]/g,'');
+            // Max 1 komma
+            var parts=v.split(',');
+            if(parts.length>2)v=parts[0]+','+parts[1];
+            // Max 2 cijfers voor komma, max 2 cijfers na komma
+            parts=v.split(',');
+            parts[0]=parts[0].slice(0,2);
+            if(parts.length>1)parts[1]=parts[1].slice(0,2);
+            this.value=parts.join(',');
+            updateTotals();calcBatch();
+          });
         } else if(ci===2){
           inp.addEventListener('input',function(){
             if(this.value.length>0){
