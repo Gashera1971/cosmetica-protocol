@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v14.3</title>
+<title>Cosmetica Protocol v14.4</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -79,6 +79,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   }
   iframe,*[class*="tiiny"],*[id*="tiiny"],*[class*="badge"],*[class*="banner"]{display:none!important;}
   div[style*="position:fixed"]{display:none!important;}
+  .gtt-hide{display:none!important;}
   #foto1wrap:not(:has(img[style*="block"])),
   #foto2wrap:not(:has(img[style*="block"])){display:none!important;}
   .foto-del-btn{display:none!important;}
@@ -268,7 +269,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.3 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v14.4 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -353,7 +354,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.3</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v14.4</div>
 
 <script>
 var isLocked=false;
@@ -443,6 +444,7 @@ var cols=[
   {name:'Ingredienten',w:130,align:'left'},
   {name:'g',w:85,align:'center',fixed:true},
   {name:'V',w:36,align:'center'},
+  {name:'gtt',w:42,align:'center'},
   {name:'info',w:80,align:'left'}
 ];
 var totalCols=[1,3];
@@ -884,6 +886,18 @@ function markEmptyRows(){
     var inp=tr.querySelector('input');
     if(inp&&inp.value.trim()!==''){tr.classList.remove('empty-row');}else{tr.classList.add('empty-row');}
   });
+  // Verberg gtt kolom bij print als alle gtt cellen leeg zijn
+  var hasGtt=false;
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var inputs=tr.querySelectorAll('td input');
+    if(inputs[5]&&inputs[5].value.trim()!=='')hasGtt=true;
+  });
+  document.querySelectorAll('#ingrBody tr').forEach(function(tr){
+    var tds=tr.querySelectorAll('td');
+    if(tds[5])tds[5].classList.toggle('gtt-hide',!hasGtt);
+  });
+  var gttHead=document.querySelector('#ingrHead th:nth-child(6)');
+  if(gttHead)gttHead.classList.toggle('gtt-hide',!hasGtt);
   // Verberg foto sectie als beide leeg zijn
   var f1=document.getElementById('foto1');
   var f2=document.getElementById('foto2');
