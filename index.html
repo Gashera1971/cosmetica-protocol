@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmetica Protocol v15.6</title>
+<title>Cosmetica Protocol v15.7</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Georgia,serif;background:#f5f0eb;min-height:100vh;padding:8px;}
@@ -153,7 +153,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
     <button class="btn btn-save" onclick="saveData()">💾 Opslaan</button>
     <label class="btn btn-load" for="loadFile" style="text-transform:none;" onclick="showToast('💡 Tip: open Google Drive app eerst!')">📂 Laden</label>
     <input type="file" id="loadFile" accept=".json" style="display:none;" onchange="loadData(event)">
-    <button class="btn btn-help" onclick="showHelp()">?</button>
+    <button class="btn btn-help" onclick="showHelp()">Help</button>
   </div>
 </div>
 
@@ -273,7 +273,7 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
 
 <div style="display:none;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;text-align:center;" class="print-footer-block">
   <div style="font-size:10px;color:#555;">https://gashera1971.github.io/cosmetica-protocol</div>
-  <div style="font-size:10px;color:#555;">Cosmetica Protocol v15.6 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
+  <div style="font-size:10px;color:#555;">Cosmetica Protocol v15.7 &nbsp;|&nbsp; © Copyright 2026 Sheila Willeboordse</div>
 </div>
 
 <!-- VERGRENDEL MODAL -->
@@ -299,66 +299,54 @@ input.opbr{font-size:20px;font-weight:700;width:80px;text-align:center;}
       style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">&#x2715;</button>
     <h2 style="font-family:Impact,sans-serif;color:#c1724a;margin-bottom:16px;font-size:22px;">Handleiding</h2>
     <h3 style="color:#333;margin:12px 0 6px;">1. Protocol deels invullen</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Vul Fase, %, Ingrediënten, Bereiding en Pr. Info in. Druk op de 💾 Opslaan button. Sla het bestandje op in Google Drive in de map <strong>"Protocollen om mee te bereiden"</strong>.</p>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Vul Fase, %, Ingrediënten, Bereiding en Pr. Info in. Druk op 💾 Opslaan → deelscherm → kies <strong>Drive</strong> → map <strong>"Protocollen om mee te bereiden"</strong>.</p>
     <h3 style="color:#333;margin:12px 0 6px;">2. In het lab — protocol bereiden</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 📂 Laden button. Kies het bestandje uit de map <strong>"Protocollen om mee te bereiden"</strong> in Google Drive. Vul Batch, V kolom, Info en Datum aan.</p>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op 📂 Laden → Bladeren → Google Drive → jouw map → tik recept. Vul Batch, V kolom, gtt, Datum aan.</p>
     <h3 style="color:#333;margin:12px 0 6px;">3. Protocol volledig ingevuld</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Druk op de 🖨 Afdrukken button om het protocol af te drukken. Druk daarna op de 💾 Opslaan button en sla het op in Google Drive in de map <strong>"Bereide protocollen"</strong>.</p>
-    <h3 style="color:#333;margin:12px 0 6px;">Spraakinvoer</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Spreek je gegevens in. Druk daarna op de 🎤 Corrigeer tekst button om gesproken woorden naar cijfers te vervangen.</p>
-    <h3 style="color:#333;margin:12px 0 6px;">% ← g button (v10.0)</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6;">Alleen rijen die je <strong>handmatig gewijzigd</strong> hebt krijgen een nieuwe % berekend. Alle andere rijen blijven <strong>ongewijzigd</strong>. Zo blijft je recept kloppen als je 1 of 2 grammen aanpast.</p>
-    <div style="margin-top:16px;padding:12px;background:#fff8f5;border-radius:8px;border-left:4px solid #c1724a;">
-      <p style="font-size:13px;color:#c1724a;font-weight:700;">Tip: De bestandsnaam begint automatisch met de productcode!</p>
-    </div>
-  </div>
-</div>
-
-<!-- SAVE MODAL -->
-<div id="saveModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
-  <div style="background:#fff;margin:20px auto;max-width:460px;border-radius:12px;padding:24px;position:relative;">
-    <button onclick="document.getElementById('saveModal').style.display='none'"
-      style="position:absolute;top:12px;right:12px;background:#c1724a;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;font-weight:700;">&#x2715;</button>
-    <h2 style="font-family:Impact,sans-serif;color:#2a7a4a;margin-bottom:16px;font-size:22px;">💾 Recept opgeslagen!</h2>
-    <p style="font-size:14px;color:#444;margin-bottom:12px;line-height:1.6;">Je recept staat in je <strong>Downloads</strong> map. Sla het op in Google Drive:</p>
-    <div style="background:#f5f0eb;border-radius:8px;padding:14px;margin-bottom:12px;">
-      <p style="font-size:13px;font-weight:700;color:#c1724a;margin-bottom:8px;">💾 OPSLAAN naar Drive:</p>
-      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">1</div>
-        <p style="font-size:13px;color:#333;line-height:1.5;">Open de <strong>Google Drive app</strong></p>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Druk 🔒 Vergrendelen → code invoeren. Dan 💾 Opslaan → Drive → map <strong>"Bereide protocollen"</strong>. Dan 🖨 Afdrukken.</p>
+    <h3 style="color:#333;margin:12px 0 6px;">💾 Opslaan naar Drive</h3>
+    <div style="background:#f5f0eb;border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">1</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Druk <strong>💾 Opslaan</strong> → deelscherm verschijnt</p>
       </div>
-      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">2</div>
-        <p style="font-size:13px;color:#333;line-height:1.5;">Tik <strong>Delen</strong> → kies <strong>Drive</strong></p>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-        <div style="background:#c1724a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">3</div>
-        <p style="font-size:13px;color:#333;line-height:1.5;">Pas evt. de naam aan → kies jouw map → <strong>Opslaan</strong></p>
-      </div>
-    </div>
-    <div style="background:#f5f0eb;border-radius:8px;padding:14px;margin-bottom:12px;">
-      <p style="font-size:13px;font-weight:700;color:#2a7a4a;margin-bottom:8px;">📂 LADEN uit Drive:</p>
-      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">1</div>
-        <p style="font-size:13px;color:#333;line-height:1.5;">Tik op <strong>📂 Laden</strong> in het template</p>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">2</div>
-        <p style="font-size:13px;color:#333;line-height:1.5;">Tik <strong>Bladeren</strong> → <strong>Google Drive</strong> → jouw map</p>
+      <div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">2</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Kies <strong>Drive</strong> → kies jouw map → <strong>Uploaden</strong></p>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start;">
-        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">3</div>
+        <div style="background:#c1724a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">3</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Drive geeft soms ook een .json.txt → die mag weg</p>
+      </div>
+    </div>
+    <h3 style="color:#333;margin:12px 0 6px;">📂 Laden uit Drive</h3>
+    <div style="background:#f5f0eb;border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">1</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Druk <strong>📂 Laden</strong> → tik <strong>Bladeren</strong></p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">2</div>
+        <p style="font-size:13px;color:#333;line-height:1.5;">Kies <strong>Google Drive</strong> → jouw map</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="background:#2a7a4a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">3</div>
         <p style="font-size:13px;color:#333;line-height:1.5;">Tik op je recept → laadt direct in!</p>
       </div>
     </div>
-    <button onclick="document.getElementById('saveModal').style.display='none'"
-      style="width:100%;margin-top:16px;background:#2a7a4a;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;">
+    <h3 style="color:#333;margin:12px 0 6px;">Spraakinvoer</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6;">Spreek in via microfoon op toetsenbord. Druk daarna op 🎤 Corrigeer tekst. Verlaat het % veld om automatisch op te ruimen.</p>
+    <div style="margin-top:12px;padding:12px;background:#fff8f5;border-radius:8px;border-left:4px solid #c1724a;">
+      <p style="font-size:13px;color:#c1724a;font-weight:700;">Tip: Bestandsnaam begint automatisch met de productcode!</p>
+    </div>
+    <button onclick="document.getElementById('helpModal').style.display='none'"
+      style="width:100%;margin-top:16px;background:#c1724a;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;">
       Begrepen! ✓
     </button>
   </div>
 </div>
 
-<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v15.6</div>
+<div class="no-print" style="text-align:right;font-size:11px;color:#555;font-weight:600;padding:4px 8px 0 0;">v15.7</div>
 
 <script>
 var isLocked=false;
@@ -994,10 +982,7 @@ function saveData(){
       document.body.appendChild(a);a.click();document.body.removeChild(a);
       setTimeout(function(){URL.revokeObjectURL(url);},2000);
     }
-    setTimeout(function(){
-      var modal=document.getElementById('saveModal');
-      if(modal)modal.style.display='block';
-    },500);
+    showToast('✅ Opgeslagen!');
   } catch(err) {
     showToast('Fout bij opslaan: '+err.message);
   }
@@ -1117,11 +1102,13 @@ buildPrepTable();
 buildNotesTable();
 applyNameStyle();
 calcBatch();
-// Vul batchVerwacht direct bij start
-var bv=document.getElementById('batchVerwacht');
-var bi2=document.getElementById('batchInput');
-if(bv&&bi2&&bi2.value)bv.value=bi2.value;
-calcTarra();
+// Vul batchVerwacht direct bij start - batchInput bestaat nu
+setTimeout(function(){
+  var bv=document.getElementById('batchVerwacht');
+  var bi2=document.getElementById('batchInput');
+  if(bv&&bi2&&bi2.value)bv.value=bi2.value;
+  calcTarra();
+},100);
 document.querySelectorAll('#ingrBody input,#prepTable input,#notesTable input').forEach(function(i){i.style.fontSize='17px';});
 applyHeaderSize();
 </script>
